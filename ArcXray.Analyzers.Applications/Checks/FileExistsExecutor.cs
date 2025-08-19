@@ -74,7 +74,7 @@ namespace ProjectTypeDetection.Executors
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Message);
+                _logger.Error($"Class: {nameof(NuGetPackageExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
 
                 // Return false for any exceptions (e.g., access denied, invalid path)
                 return Task.FromResult(false);
