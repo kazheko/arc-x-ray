@@ -22,9 +22,6 @@ namespace ArcXray.Contracts.Application
         [JsonPropertyName("pattern")]
         public string Pattern { get; set; }
 
-        [JsonPropertyName("expectedAttribute")]
-        public string ExpectedAttribute { get; set; }
-
         [JsonPropertyName("expectedAttributes")]
         public List<string> ExpectedAttributes { get; set; }
 
