@@ -24,14 +24,14 @@ namespace ProjectTypeDetection.Executors
         /// Checks if specified package(s) are referenced in the project.
         /// </summary>
         /// <param name="check">Check configuration containing target package and alternatives</param>
-        /// <param name="context">Project context with pre-loaded package references</param>
+        /// <param name="projectContext">Project context with pre-loaded package references</param>
         /// <returns>True if the package (or any alternative) is found, false otherwise</returns>
-        public Task<bool> ExecuteAsync(Check check, ProjectContext context)
+        public Task<bool> ExecuteAsync(Check check, ProjectContext projectContext)
         {
             try
             {
                 // Step 1: Check if the main target package exists
-                bool mainPackageFound = CheckPackageExists(check.Target, context);
+                bool mainPackageFound = CheckPackageExists(check.Target, projectContext);
 
                 if (mainPackageFound)
                 {
@@ -46,7 +46,7 @@ namespace ProjectTypeDetection.Executors
                 {
                     foreach (var alternativePackage in check.AlternativeTargets)
                     {
-                        bool altPackageFound = CheckPackageExists(alternativePackage, context);
+                        bool altPackageFound = CheckPackageExists(alternativePackage, projectContext);
                         if (altPackageFound)
                         {
                             // Found an alternative package
@@ -58,7 +58,7 @@ namespace ProjectTypeDetection.Executors
                 // Step 3: Special case - check for implicit framework references
                 // Some packages like "Microsoft.AspNetCore.App" might be included as FrameworkReference
                 // rather than PackageReference in modern .NET projects
-                bool isFrameworkReference = CheckIfFrameworkReference(check.Target, context);
+                bool isFrameworkReference = CheckIfFrameworkReference(check.Target, projectContext);
                 if (isFrameworkReference)
                 {
                     return Task.FromResult(true);
@@ -69,7 +69,7 @@ namespace ProjectTypeDetection.Executors
             }
             catch (Exception ex)
             {
-                _logger.Error($"Class: {nameof(NuGetPackageExecutor)}; Check: {check.Id}; Project: {context.ProjectName}; Message: {ex.Message}.");
+                _logger.Error($"Class: {nameof(NuGetPackageExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
 
                 // Return false on any error to avoid false positives
                 return Task.FromResult(false);
