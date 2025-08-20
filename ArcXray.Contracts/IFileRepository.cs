@@ -2,8 +2,9 @@
 {
     public interface IFileRepository
     {
-        IEnumerable<string> GetAllFiles(string rootPath, string searchPattern);
-        bool IsDirectoryExist(string? path)
+        IEnumerable<string> FindFiles(string rootPath, string searchPattern);
+        bool IsDirectoryExist(string? path);
         string GetRelativePath(string relativeTo, string path);
+        Task<string> ReadFileAsync(string filePath);
     }
 }

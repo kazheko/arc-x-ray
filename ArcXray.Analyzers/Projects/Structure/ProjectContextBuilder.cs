@@ -59,6 +59,11 @@ namespace ArcXray.Analyzers.Projects.Structure
         {
             // Load and parse XML
             var doc = XDocument.Load(csprojPath);
+            context.UpdateProjectFileContent(doc);
+
+            // Load project Target Frameworks
+            var frameworks = CsprojParser.GetTargetFrameworks(doc);
+            context.UpdateTargetFrameworks(frameworks);
 
             // Load project SDK
             var sdk = CsprojParser.GetSdk(doc);
@@ -94,7 +99,7 @@ namespace ArcXray.Analyzers.Projects.Structure
         {
             try
             {
-                var allFiles = _fileRepository.GetAllFiles(projectPath, "*.*");
+                var allFiles = _fileRepository.FindFiles(projectPath, "*.*");
 
                 return allFiles.Where(file => IsInExcludedFolder(projectPath, file));
             }

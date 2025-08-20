@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\ArcXray.Contracts\ArcXray.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

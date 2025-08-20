@@ -10,6 +10,29 @@ namespace ArcXray.Analyzers.Projects.Structure
             return doc.Root?.Attribute("Sdk")?.Value;
         }
 
+        public static string[] GetTargetFrameworks(XDocument doc)
+        {
+            // Step 1: if project is multi-targets
+            var tfms = doc.Descendants("TargetFrameworks")
+                .FirstOrDefault()?.Value;
+
+            if (!string.IsNullOrEmpty(tfms))
+            {
+                return tfms.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            }
+
+            // Step 2: check TargetFramework
+            var tfm = doc.Descendants("TargetFramework")
+                .FirstOrDefault()?.Value;
+
+            if (!string.IsNullOrEmpty(tfm))
+            {
+                return new[] { tfm };
+            }
+
+            return Array.Empty<string>();
+        }
+
         public static IEnumerable<PackageReference> GetPackageReferences(XDocument doc)
         {
             var root = doc.Root;
