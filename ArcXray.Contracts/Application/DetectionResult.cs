@@ -2,6 +2,7 @@
 {
     public class DetectionResult
     {
+        public string ProjectName { get; set; }
         public string ProjectPath { get; set; }
         public string ProjectType { get; set; }
         public double Confidence

@@ -32,6 +32,7 @@ namespace ArcXray.Analyzers.Applications
             var startTime = DateTime.UtcNow;
             var result = new DetectionResult
             {
+                ProjectName = projectContext.ProjectName,
                 ProjectPath = projectContext.ProjectPath,
                 ProjectType = config.Metadata.ProjectType,
                 AnalysisTimestamp = startTime
