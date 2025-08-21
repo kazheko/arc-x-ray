@@ -8,10 +8,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="knowledge-base\app-detection\webapi-detection-config.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="knowledge-base\app-detection\webapi-detection-config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta7.25380.108" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ArcXray.Analyzers.Applications\ArcXray.Analyzers.Applications.csproj" />
+    <ProjectReference Include="..\..\ArcXray.Analyzers.Structure\ArcXray.Analyzers.Structure.csproj" />
+    <ProjectReference Include="..\..\ArcXray.Contracts\ArcXray.Contracts.csproj" />
     <ProjectReference Include="..\ArcXray.Core\ArcXray.Core.csproj" />
   </ItemGroup>
 

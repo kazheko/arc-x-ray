@@ -1,63 +1,28 @@
-﻿using ArcXray.Cli;
-using ArcXray.Core.RepositoryStructure;
-using System.CommandLine;
+﻿using ArcXray.Core;
+using Microsoft.Extensions.DependencyInjection;
 
-// Define command-line options
-var repoPathOption = new Option<string>("--repo-path")
-{ 
-    Description = "Path to the repository root",
-    Required = true,
-};
-
-var excludeOption = new Option<string>("--exclude")
+namespace ArcXray.Cli
 {
-    Description = "Semicolon-separated list of keywords to exclude projects",
-    DefaultValueFactory = (a) => ""
-};
-
-var reportOption = new Option<string>("--report")
-{
-    Description = "Report strategy: console, json, etc.",
-    DefaultValueFactory = a => "console"
-};
-
-// Root command
-var rootCommand = new RootCommand("Arc X-ray - Analyze .NET solutions and projects")
-{
-    repoPathOption,
-    excludeOption,
-    reportOption
-};
-
-// Command handler
-rootCommand.SetAction(result =>
-{
-    var repoPath = result.GetValue(repoPathOption);
-    var exclude = result.GetValue(excludeOption);
-    var report = result.GetValue(reportOption);
-
-    if (!Directory.Exists(repoPath))
+    static class Program
     {
-        Console.WriteLine("❌ Invalid path: " + repoPath);
-        return;
+        static async Task Main(string[] args)
+        {
+            var rootCommand = CommandBuilder.Build(ExecuteAsync);
+
+            var parseResult = rootCommand.Parse(args);
+
+            await parseResult.InvokeAsync();
+        }
+
+        static async Task ExecuteAsync(string repoPath, string[] excludeKeywords, string detectionConfigPath)
+        {
+            var serviceCollection = DIConfiguration.Configure();
+
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            await serviceProvider
+                .GetRequiredService<Pipeline>()
+                .ExecuteAsync(repoPath, excludeKeywords, detectionConfigPath);
+        }
     }
-
-    var excludeKeywords = exclude.Split(';', StringSplitOptions.RemoveEmptyEntries);
-
-    // Setup services
-    var repositoryInfo = RepositoryAnalyzer.Analyze(repoPath, excludeKeywords);
-
-    // Choose report strategy
-    IReportStrategy reportStrategy = report.ToLower() switch
-    {
-        "console" => new ConsoleReportStrategy(),
-        _ => new ConsoleReportStrategy()
-    };
-
-    // Generate report
-    reportStrategy.GenerateReport(repositoryInfo);
-
-});
-
-ParseResult parseResult = rootCommand.Parse(args);
-return await parseResult.InvokeAsync();
+}

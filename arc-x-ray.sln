@@ -7,6 +7,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcXray.Cli", "src\ArcXray.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcXray.Core", "src\ArcXray.Core\ArcXray.Core.csproj", "{440766BB-5322-4627-B678-314259A221B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcXray.Contracts", "ArcXray.Contracts\ArcXray.Contracts.csproj", "{73B3C738-1366-4A72-ADEA-D5A1DAABBA2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcXray.Analyzers.Applications", "ArcXray.Analyzers.Applications\ArcXray.Analyzers.Applications.csproj", "{2FE9D9AC-D097-41F2-8AF3-AB353A42CB53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcXray.Analyzers.Structure", "ArcXray.Analyzers.Structure\ArcXray.Analyzers.Structure.csproj", "{E4FA0366-38E8-452A-BEE6-A90BE8594F56}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{E2544B8D-DCA0-43DD-92BC-49541DFF5D14}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +31,27 @@ Global
 		{440766BB-5322-4627-B678-314259A221B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{440766BB-5322-4627-B678-314259A221B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{440766BB-5322-4627-B678-314259A221B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73B3C738-1366-4A72-ADEA-D5A1DAABBA2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73B3C738-1366-4A72-ADEA-D5A1DAABBA2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73B3C738-1366-4A72-ADEA-D5A1DAABBA2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73B3C738-1366-4A72-ADEA-D5A1DAABBA2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FE9D9AC-D097-41F2-8AF3-AB353A42CB53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FE9D9AC-D097-41F2-8AF3-AB353A42CB53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FE9D9AC-D097-41F2-8AF3-AB353A42CB53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FE9D9AC-D097-41F2-8AF3-AB353A42CB53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4FA0366-38E8-452A-BEE6-A90BE8594F56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4FA0366-38E8-452A-BEE6-A90BE8594F56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4FA0366-38E8-452A-BEE6-A90BE8594F56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4FA0366-38E8-452A-BEE6-A90BE8594F56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{440766BB-5322-4627-B678-314259A221B4} = {E2544B8D-DCA0-43DD-92BC-49541DFF5D14}
+		{73B3C738-1366-4A72-ADEA-D5A1DAABBA2C} = {E2544B8D-DCA0-43DD-92BC-49541DFF5D14}
+		{2FE9D9AC-D097-41F2-8AF3-AB353A42CB53} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E4FA0366-38E8-452A-BEE6-A90BE8594F56} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A2B2E2F6-DB35-4C78-9578-E69875E67764}

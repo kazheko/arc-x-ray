@@ -1,0 +1,351 @@
+{
+  "metadata": {
+    "projectType": "ASP.NET Core Web API",
+    "schemaVersion": "2.0.0",
+    "description": "Configuration for detecting ASP.NET Core Web API projects in mixed solutions",
+    "lastUpdated": "2024-01-15"
+  },
+  "interpretationRules": {
+    "thresholds": [
+      {
+        "min": 0.85,
+        "max": 1.0,
+        "interpretation": "Definitely ASP.NET Core Web API",
+        "confidence": "high"
+      },
+      {
+        "min": 0.70,
+        "max": 0.85,
+        "interpretation": "Likely Web API with non-standard configuration",
+        "confidence": "medium-high"
+      },
+      {
+        "min": 0.50,
+        "max": 0.70,
+        "interpretation": "Partially Web API project or MVC with API features",
+        "confidence": "medium"
+      },
+      {
+        "min": 0.0,
+        "max": 0.50,
+        "interpretation": "Likely NOT Web API",
+        "confidence": "low"
+      }
+    ],
+    "minimumChecksForConfidence": {
+      "high": ["sdk-web", "controller-base-inheritance", "api-controller-attr", "add-controllers-any", "http-methods"]
+    }
+  },
+  "checks": [
+    {
+      "id": "sdk-web",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/@Sdk",
+      "expectedValue": "Microsoft.NET.Sdk.Web",
+      "weight": 1.0,
+      "description": "Web SDK (excludes WPF, console, and class libraries)"
+    },
+    {
+      "id": "controller-base-inheritance",
+      "category": "mandatory",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassInheritance",
+      "expectedBase": "ControllerBase",
+      "weight": 1.0,
+      "description": "Controllers inherit from ControllerBase (not Controller)"
+    },
+    {
+      "id": "api-controller-attr",
+      "category": "mandatory",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassAttribute",
+      "expectedAttributes": ["ApiController"],
+      "weight": 1.0,
+      "description": "[ApiController] attribute - specific to Web API"
+    },
+    {
+      "id": "add-controllers-pure",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddControllers\\(\\)",
+      "weight": 1.0,
+      "description": "AddControllers() - pure API configuration"
+    },
+    {
+      "id": "add-controllers-with-views",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddControllersWithViews\\(",
+      "weight": 0.6,
+      "description": "AddControllersWithViews() - MVC that might serve API"
+    },
+    {
+      "id": "no-view-files",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Views/",
+      "weight": -0.8,
+      "description": "No Views directory (negative weight if exists)"
+    },
+    {
+      "id": "no-razor-files",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "**/*.cshtml",
+      "weight": -0.7,
+      "description": "No Razor view files (negative weight if exists)"
+    },
+    {
+      "id": "target-framework",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/PropertyGroup/TargetFramework",
+      "pattern": "^net[6-9]\\.\\d$|^net\\d{2,}\\.\\d$",
+      "weight": 1.0,
+      "description": "Modern .NET version"
+    },
+    {
+      "id": "program-or-startup-exists",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Program.cs",
+      "alternativeTargets": ["Startup.cs"],
+      "weight": 1.0,
+      "description": "Program.cs or Startup.cs exists"
+    },
+    {
+      "id": "swagger-package",
+      "category": "primary",
+      "type": "NuGetPackage",
+      "target": "Swashbuckle.AspNetCore",
+      "alternativeTargets": ["NSwag.AspNetCore", "NSwag.AspNetCore.AspNet"],
+      "weight": 0.7,
+      "description": "Swagger/OpenAPI documentation package (optional but common)"
+    },
+    {
+      "id": "openapi-package",
+      "category": "auxiliary",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.OpenApi",
+      "weight": 0.5,
+      "description": "OpenAPI package (only for .NET 7+)"
+    },
+    {
+      "id": "controllers-directory",
+      "category": "primary",
+      "type": "FileExists",
+      "target": "Controllers/",
+      "weight": 0.9,
+      "description": "Controllers directory exists"
+    },
+    {
+      "id": "route-attribute",
+      "category": "primary",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassAttribute",
+      "expectedAttributes": ["Route"],
+      "pattern": "api/\\[controller\\]|api/v\\d+/\\[controller\\]",
+      "weight": 0.9,
+      "description": "Route with api/ prefix"
+    },
+    {
+      "id": "add-endpoints-explorer",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddEndpointsApiExplorer\\(\\)",
+      "weight": 0.5,
+      "description": "EndpointsApiExplorer (only with OpenAPI)"
+    },
+    {
+      "id": "add-swagger-gen",
+      "category": "primary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddSwaggerGen\\(",
+      "weight": 0.7,
+      "description": "Swagger generation configuration"
+    },
+    {
+      "id": "map-controllers",
+      "category": "primary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapControllers\\(\\)",
+      "weight": 0.9,
+      "description": "Controller mapping without Views"
+    },
+    {
+      "id": "use-swagger",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseSwagger\\(",
+      "weight": 0.5,
+      "description": "Swagger middleware (optional)"
+    },
+    {
+      "id": "use-swagger-ui",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseSwaggerUI\\(",
+      "weight": 0.5,
+      "description": "Swagger UI (optional)"
+    },
+    {
+      "id": "http-methods",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "MethodAttribute",
+      "expectedAttributes": ["HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"],
+      "weight": 0.8,
+      "description": "RESTful HTTP method attributes"
+    },
+    {
+      "id": "action-result-return",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "MethodReturnType",
+      "expectedTypes": ["IActionResult", "ActionResult", "Task<IActionResult>", "Task<ActionResult"],
+      "weight": 0.8,
+      "description": "API-specific return types"
+    },
+    {
+      "id": "model-binding-attrs",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ParameterAttribute",
+      "expectedAttributes": ["FromBody", "FromQuery", "FromRoute", "FromHeader", "FromForm"],
+      "weight": 0.8,
+      "description": "API model binding attributes"
+    },
+    {
+      "id": "jwt-bearer-package",
+      "category": "strong",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "weight": 0.8,
+      "description": "JWT - typical API authentication"
+    },
+    {
+      "id": "versioning-package",
+      "category": "strong",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.Mvc.Versioning",
+      "alternativeTargets": ["Asp.Versioning.Mvc", "Asp.Versioning.Http", "Asp.Versioning.Mvc.ApiExplorer"],
+      "weight": 0.8,
+      "description": "API versioning"
+    },
+    {
+      "id": "fluent-validation-package",
+      "category": "medium",
+      "type": "NuGetPackage",
+      "target": "FluentValidation.AspNetCore",
+      "alternativeTargets": ["FluentValidation.DependencyInjectionExtensions"],
+      "weight": 0.7,
+      "description": "FluentValidation for request validation"
+    },
+    {
+      "id": "add-cors",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddCors\\(\\)",
+      "weight": 0.7,
+      "description": "CORS configuration for API"
+    },
+    {
+      "id": "use-cors",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseCors\\(\\)",
+      "weight": 0.7,
+      "description": "CORS middleware"
+    },
+    {
+      "id": "add-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddAuthentication\\(",
+      "weight": 0.7,
+      "description": "Authentication configuration"
+    },
+    {
+      "id": "use-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseAuthentication\\(\\)",
+      "weight": 0.7,
+      "description": "Authentication middleware"
+    },
+    {
+      "id": "models-directory",
+      "category": "medium",
+      "type": "FileExists",
+      "target": "Models/",
+      "alternativeTargets": ["DTOs/", "Contracts/", "ViewModels/"],
+      "weight": 0.7,
+      "description": "API data models"
+    },
+    {
+      "id": "validation-attributes",
+      "category": "medium",
+      "type": "CodeAnalysis",
+      "target": "Models/*.cs",
+      "analysisType": "PropertyAttribute",
+      "expectedAttributes": ["Required", "Range", "StringLength", "RegularExpression", "EmailAddress"],
+      "weight": 0.7,
+      "description": "Model validation attributes"
+    },
+    {
+      "id": "xml-documentation",
+      "category": "auxiliary",
+      "type": "ProjectFile",
+      "target": "Project/PropertyGroup/GenerateDocumentationFile",
+      "expectedValue": "true",
+      "weight": 0.5,
+      "description": "XML documentation for Swagger"
+    },
+    {
+      "id": "produces-response-type",
+      "category": "auxiliary",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "MethodAttribute",
+      "expectedAttributes": ["ProducesResponseType"],
+      "weight": 0.5,
+      "description": "Typed API responses"
+    },
+    {
+      "id": "health-checks",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddHealthChecks\\(\\)",
+      "weight": 0.5,
+      "description": "Health checks for API monitoring"
+    },
+    {
+      "id": "map-health-checks",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapHealthChecks\\(",
+      "weight": 0.5,
+      "description": "Health check endpoints"
+    }
+  ]
+}
