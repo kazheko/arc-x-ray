@@ -16,20 +16,11 @@ namespace ArcXray.Contracts.Application
         [JsonPropertyName("target")]
         public string Target { get; set; }
 
-        [JsonPropertyName("expectedValue")]
-        public string ExpectedValue { get; set; }
+        [JsonPropertyName("expectedValues")]
+        public List<string> ExpectedValues { get; set; }
 
         [JsonPropertyName("pattern")]
         public string Pattern { get; set; }
-
-        [JsonPropertyName("expectedAttributes")]
-        public List<string> ExpectedAttributes { get; set; }
-
-        [JsonPropertyName("expectedBase")]
-        public string ExpectedBase { get; set; }
-
-        [JsonPropertyName("expectedTypes")]
-        public List<string> ExpectedTypes { get; set; }
 
         [JsonPropertyName("alternativeTargets")]
         public List<string> AlternativeTargets { get; set; }

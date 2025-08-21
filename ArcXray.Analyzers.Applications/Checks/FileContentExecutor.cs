@@ -196,11 +196,11 @@ namespace ArcXray.Analyzers.Applications.Checks
             // Priority 2: Exact text search
             // Used for simple string containment
             // Example: ExpectedValue = "AddControllers()"
-            if (!string.IsNullOrEmpty(check.ExpectedValue))
+            if (check.ExpectedValues.Any())
             {
                 // Return a function that checks if content contains the expected text
                 // Case-insensitive search for flexibility
-                return content => content.IndexOf(check.ExpectedValue, StringComparison.OrdinalIgnoreCase) >= 0;
+                return content => check.ExpectedValues.Any(value => content.Contains(value, StringComparison.OrdinalIgnoreCase));
             }
 
             // No search criteria specified

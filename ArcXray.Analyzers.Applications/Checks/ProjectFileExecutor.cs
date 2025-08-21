@@ -40,13 +40,15 @@ namespace ArcXray.Analyzers.Applications.Checks
                 bool checkResult;
                 if (IsSdkCheck(check.Target))
                 {
-                    checkResult = projectContext.Sdk.Equals(check.ExpectedValue, StringComparison.OrdinalIgnoreCase);
+                    checkResult = check.ExpectedValues.Any(value => value.Equals(projectContext.Sdk, StringComparison.OrdinalIgnoreCase));
                 }
                 else if (IsFrameworkCheck(check.Target))
                 {
                     if(string.IsNullOrEmpty(check.Pattern))
                     {
-                        checkResult = projectContext.TargetFrameworks.Any(f => f.Equals(check.ExpectedValue, StringComparison.OrdinalIgnoreCase));
+                        checkResult = projectContext.TargetFrameworks
+                            .Intersect(check.ExpectedValues, StringComparer.OrdinalIgnoreCase)
+                            .Any();
                     }
                     else
                     {
@@ -177,11 +179,11 @@ namespace ArcXray.Analyzers.Applications.Checks
             }
 
             // Check if we have an expected value to compare against
-            if (!string.IsNullOrEmpty(check.ExpectedValue))
+            if (check.ExpectedValues.Any())
             {
                 // Exact match comparison (case-insensitive)
                 // Example: Sdk="Microsoft.NET.Sdk.Web" should match "Microsoft.NET.Sdk.Web"
-                return attributeValue.Equals(check.ExpectedValue, StringComparison.OrdinalIgnoreCase);
+                return check.ExpectedValues.Any(v => v.Equals(attributeValue, StringComparison.OrdinalIgnoreCase));
             }
 
             // If no expected value specified, just check that attribute exists
@@ -255,11 +257,12 @@ namespace ArcXray.Analyzers.Applications.Checks
         private bool CheckValue(string actualValue, Check check)
         {
             // Priority 1: Check for exact expected value match
-            if (!string.IsNullOrEmpty(check.ExpectedValue))
+            if (check.ExpectedValues.Any())
             {
                 // Exact match (case-insensitive)
                 // Example: TargetFramework value "net8.0" should match "net8.0"
-                return actualValue.Equals(check.ExpectedValue, StringComparison.OrdinalIgnoreCase);
+
+                return check.ExpectedValues.Any(v => v.Equals(actualValue, StringComparison.OrdinalIgnoreCase));
             }
 
             // Priority 2: Check against regex pattern

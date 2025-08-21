@@ -96,77 +96,8 @@ namespace ArcXray.Analyzers.Applications.Checks
         /// <returns>Pre-filter function or null</returns>
         private Func<string, bool>? CreatePreFilter(Check check)
         {
-            switch (check.AnalysisType)
-            {
-                case "ClassInheritance":
-                    // Quick check: file must contain the base class name
-                    // Example: Looking for ControllerBase -> file must contain "ControllerBase"
-                    if (!string.IsNullOrEmpty(check.ExpectedBase))
-                    {
-                        return content => content.Contains(check.ExpectedBase, StringComparison.OrdinalIgnoreCase);
-                    }
-                    break;
-
-                case "ClassAttribute":
-                    // Quick check: file must contain the attribute name
-                    // Example: Looking for [ApiController] -> file must contain "ApiController"
-                    var classAttrs = check.ExpectedAttributes ?? new List<string>();
-
-                    if (classAttrs.Any())
-                    {
-                        return content => classAttrs.Any(attr => content.Contains(attr, StringComparison.OrdinalIgnoreCase));
-                    }
-                    break;
-
-                case "MethodAttribute":
-                    // Quick check: file must contain at least one of the expected attributes
-                    // Example: Looking for [HttpGet] -> file must contain "HttpGet"
-                    var methodAttrs = check.ExpectedAttributes ?? new List<string>();
-
-                    if (methodAttrs.Any())
-                    {
-                        return content => methodAttrs.Any(attr =>
-                            content.Contains(attr, StringComparison.OrdinalIgnoreCase));
-                    }
-                    break;
-
-                case "MethodReturnType":
-                    // Quick check: file must contain at least one of the return types
-                    // Example: Looking for IActionResult -> file must contain "IActionResult"
-                    if (check.ExpectedTypes != null && check.ExpectedTypes.Any())
-                    {
-                        return content => check.ExpectedTypes.Any(type =>
-                            content.Contains(type, StringComparison.OrdinalIgnoreCase));
-                    }
-                    break;
-
-                case "ParameterAttribute":
-                    // Quick check: file must contain at least one of the parameter attributes
-                    // Example: Looking for [FromBody] -> file must contain "FromBody"
-                    var paramAttrs = check.ExpectedAttributes ?? new List<string> ();
-
-                    if (paramAttrs != null && paramAttrs.Any())
-                    {
-                        return content => paramAttrs.Any(attr =>
-                            content.Contains(attr, StringComparison.OrdinalIgnoreCase));
-                    }
-                    break;
-
-                case "PropertyAttribute":
-                    // Quick check: file must contain at least one of the property attributes
-                    // Example: Looking for [Required] -> file must contain "Required"
-                    var propAttrs = check.ExpectedAttributes ?? new List<string> ();
-
-                    if (propAttrs != null && propAttrs.Any())
-                    {
-                        return content => propAttrs.Any(attr =>
-                            content.Contains(attr, StringComparison.OrdinalIgnoreCase));
-                    }
-                    break;
-            }
-
-            // No effective pre-filter for this analysis type
-            return null;
+            // todo: implement Aho–Corasick
+            return content => check.ExpectedValues.Any(value => content.Contains(value, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -310,8 +241,9 @@ namespace ArcXray.Analyzers.Applications.Checks
 
                     // Check for exact match or qualified name match
                     // Examples: "ControllerBase" or "Microsoft.AspNetCore.Mvc.ControllerBase"
-                    if (typeName.Equals(check.ExpectedBase, StringComparison.OrdinalIgnoreCase) ||
-                        typeName.EndsWith("." + check.ExpectedBase, StringComparison.OrdinalIgnoreCase))
+                    if (check.ExpectedValues.Any(value => value.Equals(typeName, StringComparison.OrdinalIgnoreCase)
+                        || check.ExpectedValues.Any(value => typeName.EndsWith($".{value}", StringComparison.OrdinalIgnoreCase))))
+
                     {
                         return true;
                     }
@@ -338,9 +270,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                     {
                         var attrName = attr.Name.ToString();
 
-                        var expectedAttributes = check.ExpectedAttributes ?? new List<string>();
-
-                        var detected = expectedAttributes.Any(atr => MatchesAttribute(attrName, atr));
+                        var detected = check.ExpectedValues.Any(atr => MatchesAttribute(attrName, atr));
 
                         if (detected)
                         {
@@ -363,9 +293,8 @@ namespace ArcXray.Analyzers.Applications.Checks
             var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
             // Build list of expected attributes
-            var expectedAttrs = check.ExpectedAttributes ?? new List<string>();
 
-            if (!expectedAttrs.Any())
+            if (!check.ExpectedValues.Any())
                 return false;
 
             foreach (var method in methods)
@@ -378,7 +307,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                         var attrName = attr.Name.ToString();
 
                         // Check if this attribute matches any of the expected ones
-                        if (expectedAttrs.Any(expected => MatchesAttribute(attrName, expected)))
+                        if (check.ExpectedValues.Any(expected => MatchesAttribute(attrName, expected)))
                         {
                             return true;
                         }
@@ -397,7 +326,7 @@ namespace ArcXray.Analyzers.Applications.Checks
         {
             var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
-            if (check.ExpectedTypes == null || !check.ExpectedTypes.Any())
+            if (!check.ExpectedValues.Any())
                 return false;
 
             foreach (var method in methods)
@@ -406,11 +335,9 @@ namespace ArcXray.Analyzers.Applications.Checks
 
                 // Check if return type contains any of the expected types
                 // This handles generic types like Task<IActionResult>
-                foreach (var expectedType in check.ExpectedTypes)
-                {
-                    if (returnType.Contains(expectedType))
-                        return true;
-                }
+                var matched = check.ExpectedValues.Any(value => returnType.Contains(value, StringComparison.OrdinalIgnoreCase));
+                if (matched)
+                    return true;
             }
 
             return false;
@@ -425,9 +352,7 @@ namespace ArcXray.Analyzers.Applications.Checks
             // Get all parameters from all methods
             var parameters = root.DescendantNodes().OfType<ParameterSyntax>();
 
-            var expectedAttrs = check.ExpectedAttributes ?? new List<string>();
-
-            if (!expectedAttrs.Any())
+            if (!check.ExpectedValues.Any())
                 return false;
 
             foreach (var param in parameters)
@@ -438,7 +363,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                     {
                         var attrName = attr.Name.ToString();
 
-                        if (expectedAttrs.Any(expected => MatchesAttribute(attrName, expected)))
+                        if (check.ExpectedValues.Any(expected => MatchesAttribute(attrName, expected)))
                         {
                             return true;
                         }
@@ -458,9 +383,7 @@ namespace ArcXray.Analyzers.Applications.Checks
             // Get all properties
             var properties = root.DescendantNodes().OfType<PropertyDeclarationSyntax>();
 
-            var expectedAttrs = check.ExpectedAttributes ?? new List<string>();
-
-            if (!expectedAttrs.Any())
+            if (!check.ExpectedValues.Any())
                 return false;
 
             foreach (var prop in properties)
@@ -471,7 +394,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                     {
                         var attrName = attr.Name.ToString();
 
-                        if (expectedAttrs.Any(expected => MatchesAttribute(attrName, expected)))
+                        if (check.ExpectedValues.Any(expected => MatchesAttribute(attrName, expected)))
                         {
                             return true;
                         }
