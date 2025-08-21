@@ -42,7 +42,7 @@
       "category": "mandatory",
       "type": "ProjectFile",
       "target": "Project/@Sdk",
-      "expectedValue": "Microsoft.NET.Sdk.Web",
+      "expectedValues": ["Microsoft.NET.Sdk.Web"],
       "weight": 1.0,
       "description": "Web SDK (excludes WPF, console, and class libraries)"
     },
@@ -52,7 +52,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "ClassInheritance",
-      "expectedBase": "ControllerBase",
+      "expectedValues": ["ControllerBase"],
       "weight": 1.0,
       "description": "Controllers inherit from ControllerBase (not Controller)"
     },
@@ -62,7 +62,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "ClassAttribute",
-      "expectedAttributes": ["ApiController"],
+      "expectedValues": ["ApiController"],
       "weight": 1.0,
       "description": "[ApiController] attribute - specific to Web API"
     },
@@ -85,7 +85,7 @@
       "description": "AddControllersWithViews() - MVC that might serve API"
     },
     {
-      "id": "no-view-files",
+      "id": "view-files",
       "category": "mandatory",
       "type": "FileExists",
       "target": "Views/",
@@ -93,7 +93,7 @@
       "description": "No Views directory (negative weight if exists)"
     },
     {
-      "id": "no-razor-files",
+      "id": "razor-files",
       "category": "mandatory",
       "type": "FileExists",
       "target": "**/*.cshtml",
@@ -149,8 +149,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "ClassAttribute",
-      "expectedAttributes": ["Route"],
-      "pattern": "api/\\[controller\\]|api/v\\d+/\\[controller\\]",
+      "expectedValues": ["Route"],
       "weight": 0.9,
       "description": "Route with api/ prefix"
     },
@@ -205,7 +204,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "MethodAttribute",
-      "expectedAttributes": ["HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"],
+      "expectedValues": ["HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"],
       "weight": 0.8,
       "description": "RESTful HTTP method attributes"
     },
@@ -215,7 +214,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "MethodReturnType",
-      "expectedTypes": ["IActionResult", "ActionResult", "Task<IActionResult>", "Task<ActionResult"],
+      "expectedValues": ["IActionResult", "ActionResult", "Task<IActionResult>", "Task<ActionResult"],
       "weight": 0.8,
       "description": "API-specific return types"
     },
@@ -225,7 +224,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "ParameterAttribute",
-      "expectedAttributes": ["FromBody", "FromQuery", "FromRoute", "FromHeader", "FromForm"],
+      "expectedValues": ["FromBody", "FromQuery", "FromRoute", "FromHeader", "FromForm"],
       "weight": 0.8,
       "description": "API model binding attributes"
     },
@@ -306,7 +305,7 @@
       "type": "CodeAnalysis",
       "target": "Models/*.cs",
       "analysisType": "PropertyAttribute",
-      "expectedAttributes": ["Required", "Range", "StringLength", "RegularExpression", "EmailAddress"],
+      "expectedValues": ["Required", "Range", "StringLength", "RegularExpression", "EmailAddress"],
       "weight": 0.7,
       "description": "Model validation attributes"
     },
@@ -315,7 +314,7 @@
       "category": "auxiliary",
       "type": "ProjectFile",
       "target": "Project/PropertyGroup/GenerateDocumentationFile",
-      "expectedValue": "true",
+      "expectedValues": ["true"],
       "weight": 0.5,
       "description": "XML documentation for Swagger"
     },
@@ -325,7 +324,7 @@
       "type": "CodeAnalysis",
       "target": "Controllers/*.cs",
       "analysisType": "MethodAttribute",
-      "expectedAttributes": ["ProducesResponseType"],
+      "expectedValues": ["ProducesResponseType"],
       "weight": 0.5,
       "description": "Typed API responses"
     },
