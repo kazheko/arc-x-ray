@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ArcXray.Analyzers.Applications.Models
+namespace ArcXray.Contracts.Application
 {
     // Models for JSON configuration
     public class DetectionConfiguration

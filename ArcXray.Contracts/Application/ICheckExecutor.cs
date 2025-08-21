@@ -1,4 +1,6 @@
-﻿namespace ArcXray.Contracts.Application
+﻿using ArcXray.Contracts.RepositoryStructure;
+
+namespace ArcXray.Contracts.Application
 {
     public interface ICheckExecutor
     {

@@ -1,9 +1,10 @@
 ﻿using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
+using ArcXray.Contracts.RepositoryStructure;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace ProjectTypeDetection.Executors
+namespace ArcXray.Analyzers.Applications.Checks
 {
     /// <summary>
     /// Analyzes .csproj file content using XML parsing.
@@ -43,7 +44,15 @@ namespace ProjectTypeDetection.Executors
                 }
                 else if (IsFrameworkCheck(check.Target))
                 {
-                    checkResult = projectContext.TargetFrameworks.Any(f => f.Equals(check.ExpectedValue, StringComparison.OrdinalIgnoreCase));
+                    if(string.IsNullOrEmpty(check.Pattern))
+                    {
+                        checkResult = projectContext.TargetFrameworks.Any(f => f.Equals(check.ExpectedValue, StringComparison.OrdinalIgnoreCase));
+                    }
+                    else
+                    {
+                        var regex = new Regex(check.Pattern, RegexOptions.Compiled);
+                        checkResult = projectContext.TargetFrameworks.Any(regex.IsMatch);
+                    }
                 }
                 else
                 {

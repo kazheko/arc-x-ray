@@ -1,9 +1,10 @@
 ﻿using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
+using ArcXray.Contracts.RepositoryStructure;
 using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.FileSystemGlobbing;
+using System.Text.RegularExpressions;
 
-namespace ProjectTypeDetection.Executors
+namespace ArcXray.Analyzers.Applications.Checks
 {
     /// <summary>
     /// Checks if a file or directory exists in the project structure.
@@ -74,7 +75,7 @@ namespace ProjectTypeDetection.Executors
             }
             catch (Exception ex)
             {
-                _logger.Error($"Class: {nameof(NuGetPackageExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
+                _logger.Error($"Class: {nameof(FileExistsExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
 
                 // Return false for any exceptions (e.g., access denied, invalid path)
                 return Task.FromResult(false);
@@ -83,14 +84,14 @@ namespace ProjectTypeDetection.Executors
 
         private bool IsFileExist(string path, ProjectContext projectContext)
         {
-            var normalizedTarget = NormalizePath(path);
+            var normalizedTarget = Helpers.NormalizePath(path);
             return projectContext.AllFiles
-                .Any(file => NormalizePath(file).Equals(normalizedTarget));
+                .Any(file => Helpers.NormalizePath(file).Equals(normalizedTarget));
         }
 
         private bool IsDirectoryExist(string directoryPath, ProjectContext projectContext)
         {
-            var normalizedDir = NormalizePath(directoryPath);
+            var normalizedDir = Helpers.NormalizePath(directoryPath);
 
             return projectContext.AllFiles
                 .Any(file =>Inside(file, normalizedDir));
@@ -100,42 +101,28 @@ namespace ProjectTypeDetection.Executors
         {
             var fileDir = Path.GetDirectoryName(file);
             return fileDir != null &&
-                   (NormalizePath(fileDir).Equals(normalizedDir) ||
-                    NormalizePath(fileDir).StartsWith(normalizedDir + Path.DirectorySeparatorChar));
+                   (Helpers.NormalizePath(fileDir).Equals(normalizedDir) ||
+                    Helpers.NormalizePath(fileDir).StartsWith(normalizedDir + Path.DirectorySeparatorChar));
         }
 
         private IEnumerable<string> GetFiles(string pattern, ProjectContext projectContext)
         {
-            var matcher = new Matcher();
-            matcher.AddInclude(pattern);
+            var directory = Path.GetDirectoryName(pattern) ?? "";
+            var filePattern = Path.GetFileName(pattern);
+            var rexexPattern = Helpers.WildcardToRegex(filePattern);
+            var regex = new Regex(rexexPattern, RegexOptions.IgnoreCase);
+
+            var fullDir = Path.Combine(projectContext.ProjectPath, directory);
 
             return projectContext.AllFiles
-                .Where(file => matcher.Match(projectContext.ProjectPath, file).HasMatches);
-        }
-
-        /// <summary>
-        /// Normalizes file paths for consistent comparison.
-        /// Handles different path separators and case sensitivity.
-        /// </summary>
-        private string NormalizePath(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return string.Empty;
-
-            // Replace alternative separators with standard ones
-            path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-            // Remove trailing separators
-            path = path.TrimEnd(Path.DirectorySeparatorChar);
-
-            // Convert to lowercase for case-insensitive comparison on Windows
-            // Keep original case on Unix-like systems
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                path = path.ToLowerInvariant();
-            }
-
-            return path;
+                .Where(file =>
+                {
+                    var fileDir = Path.GetDirectoryName(file);
+                    var fileName = Path.GetFileName(file);
+                    return fileDir != null &&
+                           Helpers.NormalizePath(fileDir).Equals(Helpers.NormalizePath(fullDir)) &&
+                           regex.IsMatch(fileName);
+                });
         }
     }
 }

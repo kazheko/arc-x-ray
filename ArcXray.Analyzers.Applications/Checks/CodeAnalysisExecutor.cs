@@ -1,11 +1,12 @@
 ﻿using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
+using ArcXray.Contracts.RepositoryStructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.FileSystemGlobbing;
+using System.Text.RegularExpressions;
 
-namespace ProjectTypeDetection.Executors
+namespace ArcXray.Analyzers.Applications.Checks
 {
     /// <summary>
     /// Analyzes C# code structure using Roslyn syntax trees.
@@ -81,7 +82,7 @@ namespace ProjectTypeDetection.Executors
             }
             catch (Exception ex)
             {
-                _logger.Error($"Class: {nameof(NuGetPackageExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
+                _logger.Error($"Class: {nameof(CodeAnalysisExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
 
                 return false;
             }
@@ -195,11 +196,8 @@ namespace ProjectTypeDetection.Executors
                 else
                 {
                     // Example of target with wildcard (Controllers/*.cs)
-                    var matcher = new Matcher();
-                    matcher.AddInclude(target);
-
                     // Filter files in the specific directory
-                    var filteredFiles = sourceFiles.Where(file => matcher.Match(context.ProjectPath, file).HasMatches);
+                    var filteredFiles = GetFiles(target, context);
 
                     files.AddRange(filteredFiles);
                 }
@@ -208,12 +206,12 @@ namespace ProjectTypeDetection.Executors
             else if (IsDirectory(target, context))
             {
                 var fullDirectory = Path.Combine(context.ProjectPath, target);
-                var normalizedDir = NormalizePath(fullDirectory) + Path.DirectorySeparatorChar;
+                var normalizedDir = Helpers.NormalizePath(fullDirectory) + Path.DirectorySeparatorChar;
 
                 // All C# files in the specified directory and subdirectories
                 var filteredFiles = sourceFiles
                     .Where(file => file.EndsWith(".cs"))
-                    .Select(file => NormalizePath(Path.GetDirectoryName(file)))
+                    .Select(file => Helpers.NormalizePath(Path.GetDirectoryName(file)))
                     .Where(dir => !string.IsNullOrEmpty(dir) && dir.StartsWith(normalizedDir, StringComparison.OrdinalIgnoreCase));
 
                 files.AddRange(filteredFiles);
@@ -225,7 +223,7 @@ namespace ProjectTypeDetection.Executors
                     ? target
                     : Path.Combine(context.ProjectPath, target);
 
-                var normalizedPath = NormalizePath(fullPath);
+                var normalizedPath = Helpers.NormalizePath(fullPath);
 
                 var matchingFile = sourceFiles.FirstOrDefault(file =>
                     file.Equals(normalizedPath, StringComparison.OrdinalIgnoreCase));
@@ -239,6 +237,26 @@ namespace ProjectTypeDetection.Executors
             return files;
         }
 
+        private IEnumerable<string> GetFiles(string pattern, ProjectContext projectContext)
+        {
+            var directory = Path.GetDirectoryName(pattern) ?? "";
+            var filePattern = Path.GetFileName(pattern);
+            var rexexPattern = Helpers.WildcardToRegex(filePattern);
+            var regex = new Regex(rexexPattern, RegexOptions.IgnoreCase);
+
+            var fullDir = Path.Combine(projectContext.ProjectPath, directory);
+
+            return projectContext.AllFiles
+                .Where(file =>
+                {
+                    var fileDir = Path.GetDirectoryName(file);
+                    var fileName = Path.GetFileName(file);
+                    return fileDir != null &&
+                           Helpers.NormalizePath(fileDir).Equals(Helpers.NormalizePath(fullDir)) &&
+                           regex.IsMatch(fileName);
+                });
+        }
+
         private static bool IsDirectory(string target, ProjectContext context)
         {
             if(target.EndsWith("/") || target.EndsWith("\\"))
@@ -247,7 +265,7 @@ namespace ProjectTypeDetection.Executors
             }
 
             var fullPath = Path.Combine(context.ProjectPath, target);
-            var normalizedDir = NormalizePath(fullPath) + Path.DirectorySeparatorChar;
+            var normalizedDir = Helpers.NormalizePath(fullPath) + Path.DirectorySeparatorChar;
 
             return context.SourceFiles.Any(file => file.StartsWith(normalizedDir));
         }
@@ -490,27 +508,6 @@ namespace ProjectTypeDetection.Executors
                 return true;
 
             return false;
-        }
-
-        // todo: remove NormalizePath
-        /// <summary>
-        /// Normalizes file paths for comparison.
-        /// </summary>
-        private static string NormalizePath(string? path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return string.Empty;
-
-            path = path.Replace('/', Path.DirectorySeparatorChar);
-            path = path.Replace('\\', Path.DirectorySeparatorChar);
-            path = path.TrimEnd(Path.DirectorySeparatorChar);
-
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                path = path.ToLowerInvariant();
-            }
-
-            return path;
         }
     }
 }

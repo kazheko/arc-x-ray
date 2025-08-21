@@ -1,8 +1,9 @@
 ﻿using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
+using ArcXray.Contracts.RepositoryStructure;
 using System.Text.RegularExpressions;
 
-namespace ProjectTypeDetection.Executors
+namespace ArcXray.Analyzers.Applications.Checks
 {
     /// <summary>
     /// Searches for specific patterns or text content within project files.
@@ -69,7 +70,7 @@ namespace ProjectTypeDetection.Executors
             }
             catch (Exception ex)
             {
-                _logger.Error($"Class: {nameof(NuGetPackageExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
+                _logger.Error($"Class: {nameof(FileContentExecutor)}; Check: {check.Id}; Project: {projectContext.ProjectName}; Message: {ex.Message}.");
 
                 return false;
             }

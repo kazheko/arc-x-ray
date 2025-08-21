@@ -1,8 +1,9 @@
 ﻿using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
-using Microsoft.Extensions.FileSystemGlobbing;
+using ArcXray.Contracts.RepositoryStructure;
+using System.Text.RegularExpressions;
 
-namespace ProjectTypeDetection.Executors
+namespace ArcXray.Analyzers.Applications.Checks
 {
     /// <summary>
     /// Checks for NuGet package references in the project.
@@ -125,10 +126,10 @@ namespace ProjectTypeDetection.Executors
             // Example: "Microsoft.EntityFrameworkCore.*" to match any EF Core package
             if (packageName.Contains("*"))
             {
-                var matcher = new Matcher();
-                matcher.AddInclude(packageName);
+                var rexexPattern = Helpers.WildcardToRegex(packageName);
+                var regex = new Regex(rexexPattern, RegexOptions.IgnoreCase);
 
-                var matched = context.PackageReferences.Any(pkg => matcher.Match(pkg.Name).HasMatches);
+                var matched = context.PackageReferences.Any(pkg => regex.IsMatch(pkg.Name));
 
                 if (matched)
                 {
