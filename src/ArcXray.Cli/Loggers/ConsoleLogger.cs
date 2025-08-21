@@ -1,6 +1,6 @@
 ﻿using ArcXray.Contracts;
 
-namespace ArcXray.Cli
+namespace ArcXray.Cli.Loggers
 {
     internal class ConsoleLogger : ILogger
     {
@@ -15,7 +15,7 @@ namespace ArcXray.Cli
         public void Info(string message)
         {
             var prevColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"[INFO] {message}");
             Console.ForegroundColor = prevColor;
         }
@@ -27,5 +27,19 @@ namespace ArcXray.Cli
             Console.WriteLine($"[WARN] {message}");
             Console.ForegroundColor = prevColor;
         }
+
+        public void Debug(string message)
+        {
+            var prevColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine($"[DEBUG] {message}");
+            Console.ForegroundColor = prevColor;
+        }
+
+        public void Log(string message)
+        {
+            Console.WriteLine(message);
+        }
     }
+
 }
