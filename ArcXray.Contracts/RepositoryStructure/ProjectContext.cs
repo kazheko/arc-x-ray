@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
-namespace ArcXray.Contracts
+namespace ArcXray.Contracts.RepositoryStructure
 {
     public class ProjectContext
     {
@@ -34,12 +33,12 @@ namespace ArcXray.Contracts
 
         public void UpdateFiles(IEnumerable<string> files)
         {
-            AllFiles = files;
+            AllFiles = files.Select(NormalizePath);
         }
 
         public void UpdateSourceFiles(IEnumerable<string> files)
         {
-            SourceFiles = files.Select(NormalizePath);
+            SourceFiles = files;
         }
 
         public void UpdateViewFiles(IEnumerable<string> files)

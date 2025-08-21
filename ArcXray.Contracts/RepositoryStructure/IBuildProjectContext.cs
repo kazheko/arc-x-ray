@@ -1,4 +1,4 @@
-﻿namespace ArcXray.Contracts
+﻿namespace ArcXray.Contracts.RepositoryStructure
 {
     public interface IBuildProjectContext
     {
