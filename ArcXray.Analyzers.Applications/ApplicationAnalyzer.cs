@@ -101,7 +101,7 @@ namespace ArcXray.Analyzers.Applications
             }
 
             // Check minimum requirements for high confidence
-            if (result.ConfidenceLevel == "high" &&
+            if (result.ConfidenceLevel == "high" && config.InterpretationRules.MinimumChecksForConfidence != null &&
                 config.InterpretationRules.MinimumChecksForConfidence.TryGetValue("high", out var requiredChecks))
             {
                 var missingChecks = requiredChecks.Where(checkId =>
