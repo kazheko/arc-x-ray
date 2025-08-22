@@ -1,0 +1,309 @@
+{
+  "metadata": {
+    "projectType": "Razor Pages",
+    "schemaVersion": "1.0.0",
+    "description": "Configuration for detecting ASP.NET Core Razor Pages projects",
+    "lastUpdated": "2024-01-15"
+  },
+  "interpretationRules": {
+    "thresholds": [
+      {
+        "min": 0.85,
+        "max": 1.0,
+        "interpretation": "Definitely Razor Pages application",
+        "confidence": "high"
+      },
+      {
+        "min": 0.70,
+        "max": 0.85,
+        "interpretation": "Likely Razor Pages with some MVC/API features",
+        "confidence": "medium-high"
+      },
+      {
+        "min": 0.50,
+        "max": 0.70,
+        "interpretation": "Hybrid project (Razor Pages + MVC/API)",
+        "confidence": "medium"
+      },
+      {
+        "min": 0.0,
+        "max": 0.50,
+        "interpretation": "Likely NOT Razor Pages application",
+        "confidence": "low"
+      }
+    ],
+    "minimumChecksForConfidence": {
+      "high": ["pages-directory", "page-models", "add-razor-pages", "page-directive", "no-controllers"],
+      "medium-high": ["pages-directory", "page-models", "add-razor-pages"]
+    }
+  },
+  "checks": [
+    {
+      "id": "sdk-web",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/@Sdk",
+      "expectedValues": ["Microsoft.NET.Sdk.Web"],
+      "weight": 1.0,
+      "description": "Web SDK required for Razor Pages"
+    },
+    {
+      "id": "target-framework",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/PropertyGroup/TargetFramework",
+      "pattern": "^net[6-9]\\.\\d$|^net\\d{2,}\\.\\d$",
+      "weight": 1.0,
+      "description": ".NET 6.0 or higher"
+    },
+    {
+      "id": "pages-directory",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Pages/",
+      "weight": 1.0,
+      "description": "Pages directory - core of Razor Pages structure"
+    },
+    {
+      "id": "page-models",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Pages/**/*.cshtml.cs",
+      "weight": 1.0,
+      "description": "Page model files (.cshtml.cs) - unique to Razor Pages"
+    },
+    {
+      "id": "add-razor-pages",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddRazorPages\\(\\)",
+      "weight": 1.0,
+      "description": "AddRazorPages() service registration"
+    },
+    {
+      "id": "map-razor-pages",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapRazorPages\\(\\)",
+      "weight": 1.0,
+      "description": "MapRazorPages() endpoint routing"
+    },
+    {
+      "id": "page-directive",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml",
+      "pattern": "^@page",
+      "weight": 1.0,
+      "description": "@page directive - unique to Razor Pages"
+    },
+    {
+      "id": "page-model-inheritance",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Pages/**/*.cshtml.cs",
+      "analysisType": "ClassInheritance",
+      "expectedValues": ["PageModel"],
+      "weight": 0.9,
+      "description": "Classes inherit from PageModel"
+    },
+    {
+      "id": "index-page",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Pages/Index.cshtml",
+      "weight": 0.8,
+      "description": "Index.cshtml page"
+    },
+    {
+      "id": "index-page-model",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Pages/Index.cshtml.cs",
+      "weight": 0.8,
+      "description": "Index.cshtml.cs page model"
+    },
+    {
+      "id": "layout-page",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Pages/Shared/_Layout.cshtml",
+      "alternativeTargets": ["Pages/_Layout.cshtml"],
+      "weight": 0.8,
+      "description": "Layout page for Razor Pages"
+    },
+    {
+      "id": "viewstart-page",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Pages/_ViewStart.cshtml",
+      "weight": 0.8,
+      "description": "_ViewStart.cshtml for default layout"
+    },
+    {
+      "id": "viewimports-page",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Pages/_ViewImports.cshtml",
+      "weight": 0.8,
+      "description": "_ViewImports.cshtml for shared imports"
+    },
+    {
+      "id": "on-handler-methods",
+      "category": "strong",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml.cs",
+      "pattern": "public\\s+(async\\s+)?Task<IActionResult>\\s+On(Get|Post|Put|Delete|Patch)",
+      "weight": 0.9,
+      "description": "OnGet/OnPost handler methods"
+    },
+    {
+      "id": "on-handler-async",
+      "category": "strong",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml.cs",
+      "pattern": "On(Get|Post|Put|Delete|Patch)Async\\s*\\(",
+      "weight": 0.9,
+      "description": "Async handler methods (OnGetAsync, OnPostAsync)"
+    },
+    {
+      "id": "no-controllers",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Controllers/",
+      "weight": -0.9,
+      "description": "No Controllers directory (negative if exists)"
+    },
+    {
+      "id": "no-views",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Views/",
+      "weight": -0.9,
+      "description": "No Views directory (negative if exists)"
+    },
+    {
+      "id": "wwwroot-directory",
+      "category": "medium",
+      "type": "FileExists",
+      "target": "wwwroot/",
+      "weight": 0.7,
+      "description": "Static files directory"
+    },
+    {
+      "id": "areas-pages",
+      "category": "medium",
+      "type": "FileExists",
+      "target": "Areas/**/Pages/",
+      "weight": 0.7,
+      "description": "Areas with Pages for large applications"
+    },
+    {
+      "id": "page-model-properties",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml.cs",
+      "pattern": "\\[BindProperty\\]|\\[BindProperties\\]",
+      "weight": 0.7,
+      "description": "[BindProperty] for model binding"
+    },
+    {
+      "id": "page-remote",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml.cs",
+      "pattern": "public\\s+JsonResult\\s+OnGet.*Remote",
+      "weight": 0.6,
+      "description": "Remote validation handlers"
+    },
+    {
+      "id": "razor-pages-options",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddRazorPages\\(.*options\\s*=>",
+      "weight": 0.6,
+      "description": "Razor Pages configuration options"
+    },
+    {
+      "id": "page-route-convention",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "PageConventionCollection|AddPageRoute",
+      "weight": 0.6,
+      "description": "Page routing conventions"
+    },
+    {
+      "id": "temp-data",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml.cs",
+      "pattern": "\\[TempData\\]|TempData\\[",
+      "weight": 0.5,
+      "description": "TempData usage"
+    },
+    {
+      "id": "partial-pages",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "Pages/**/_*.cshtml",
+      "weight": 0.5,
+      "description": "Partial pages (start with underscore)"
+    },
+    {
+      "id": "error-page",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "Pages/Error.cshtml",
+      "weight": 0.5,
+      "description": "Error page"
+    },
+    {
+      "id": "privacy-page",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "Pages/Privacy.cshtml",
+      "weight": 0.5,
+      "description": "Privacy page (common in templates)"
+    },
+    {
+      "id": "page-filter",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "IPageFilter|IAsyncPageFilter|PageFilterAttribute",
+      "weight": 0.5,
+      "description": "Page filters for cross-cutting concerns"
+    },
+    {
+      "id": "authorize-page",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml",
+      "pattern": "@attribute\\s+\\[Authorize",
+      "weight": 0.5,
+      "description": "Authorization on pages"
+    },
+    {
+      "id": "no-add-mvc",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddMvc\\(\\)",
+      "weight": -0.4,
+      "description": "No AddMvc() (negative if found - suggests MVC)"
+    },
+    {
+      "id": "no-add-controllers-with-views",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddControllersWithViews\\(\\)",
+      "weight": -0.4,
+      "description": "No AddControllersWithViews() (negative if found)"
+    }
+  ]
+}
