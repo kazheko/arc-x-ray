@@ -3,7 +3,7 @@
 namespace ArcXray.Contracts.Application
 {
     // Models for JSON configuration
-    public class DetectionConfiguration
+    public class CheckList
     {
         [JsonPropertyName("metadata")]
         public Metadata Metadata { get; set; }

@@ -19,8 +19,7 @@ namespace ArcXray.Cli
 
             serviceCollection.AddTransient<ILogger, ConsoleLogger>();
             serviceCollection.AddTransient<IFileRepository, FileSystemRepository>();
-            serviceCollection.AddTransient<IProvideDetectionConfig, DetectionConfigProvider>();
-            serviceCollection.AddTransient<IProvideDetectionConfig, DetectionConfigProvider>();
+            serviceCollection.AddTransient<IProvideCheckList, CheckListProvider>();
             serviceCollection.AddTransient<IAnalyzeRepository, RepositoryAnalyzer>();
 
             serviceCollection.AddTransient<ApplicationAnalyzer>();

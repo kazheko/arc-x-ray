@@ -10,14 +10,14 @@ namespace ArcXray.Core
         private readonly IAnalyzeRepository _structureAnalyzer;
         private readonly IAnalyzeApplication _analyzeApplication;
         private readonly IBuildProjectContext _buildProjectContext;
-        private readonly IProvideDetectionConfig _provideDetectionConfig;
+        private readonly IProvideCheckList _provideDetectionConfig;
 
         public Pipeline
         (
             IAnalyzeRepository structureAnalyzer,
             IAnalyzeApplication analyzeApplication,
             IBuildProjectContext buildProjectContext,
-            IProvideDetectionConfig provideDetectionConfig,
+            IProvideCheckList provideDetectionConfig,
             ILogger logger)
         {
             _structureAnalyzer = structureAnalyzer;

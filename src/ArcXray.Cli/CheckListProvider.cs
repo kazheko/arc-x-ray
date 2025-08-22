@@ -5,16 +5,16 @@ using System.Text.Json;
 
 namespace ArcXray.Cli
 {
-    public class DetectionConfigProvider : IProvideDetectionConfig
+    public class CheckListProvider : IProvideCheckList
     {
         private readonly IFileRepository _fileRepository;
 
-        public DetectionConfigProvider(IFileRepository fileRepository)
+        public CheckListProvider(IFileRepository fileRepository)
         {
             _fileRepository = fileRepository;
         }
 
-        public async Task<IEnumerable<DetectionConfiguration>> GetConfigAsync(string framework, string sdk, string directory)
+        public async Task<IEnumerable<CheckList>> GetConfigAsync(string framework, string sdk, string directory)
         {
             var netVersion = framework.Replace("net", string.Empty);
 
@@ -27,17 +27,17 @@ namespace ArcXray.Cli
 
             if (!Directory.Exists(dir))
             {
-                return Enumerable.Empty<DetectionConfiguration>();
+                return Enumerable.Empty<CheckList>();
             }
 
             var files = _fileRepository.FindFiles(dir, "*.json");
 
-            var result = new List<DetectionConfiguration>();
+            var result = new List<CheckList>();
 
             foreach (var path in files)
             {
                 var content = await _fileRepository.ReadFileAsync(path);
-                var config = JsonSerializer.Deserialize<DetectionConfiguration>(content);
+                var config = JsonSerializer.Deserialize<CheckList>(content);
                 if (config != null)
                 {
                     result.Add(config);

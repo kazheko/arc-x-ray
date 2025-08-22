@@ -51,7 +51,7 @@ namespace ArcXray.Cli
                 // Setup services
 
                 // todo: remove hard-coded strings
-                await actionAsync(repoPath, excludeKeywords, "./knowledge-base/app-detection/");
+                await actionAsync(repoPath, excludeKeywords, "./knowledge-base/entry-points/");
             });
 
             return rootCommand;

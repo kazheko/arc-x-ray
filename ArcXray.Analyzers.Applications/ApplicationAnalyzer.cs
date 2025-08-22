@@ -27,7 +27,7 @@ namespace ArcXray.Analyzers.Applications
             
         }
 
-        public async Task<DetectionResult> AnalyzeProjectAsync(ProjectContext projectContext, DetectionConfiguration config)
+        public async Task<DetectionResult> AnalyzeProjectAsync(ProjectContext projectContext, CheckList config)
         {
             var startTime = DateTime.UtcNow;
             var result = new DetectionResult
@@ -84,7 +84,7 @@ namespace ArcXray.Analyzers.Applications
             return checkResult;
         }
 
-        private void DetermineInterpretation(DetectionResult result, DetectionConfiguration config)
+        private void DetermineInterpretation(DetectionResult result, CheckList config)
         {
             var threshold = config.InterpretationRules.Thresholds
                 .FirstOrDefault(t => result.Confidence >= t.Min && result.Confidence <= t.Max);

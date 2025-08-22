@@ -14,7 +14,7 @@ namespace ArcXray.Cli.Loggers
             _analyzer = analyzer;
         }
 
-        public async Task<DetectionResult> AnalyzeProjectAsync(ProjectContext projectContext, DetectionConfiguration config)
+        public async Task<DetectionResult> AnalyzeProjectAsync(ProjectContext projectContext, CheckList config)
         {
             var result = await _analyzer.AnalyzeProjectAsync(projectContext, config);
 
