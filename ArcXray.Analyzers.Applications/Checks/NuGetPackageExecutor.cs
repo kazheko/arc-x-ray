@@ -126,8 +126,7 @@ namespace ArcXray.Analyzers.Applications.Checks
             // Example: "Microsoft.EntityFrameworkCore.*" to match any EF Core package
             if (packageName.Contains("*"))
             {
-                var rexexPattern = Helpers.WildcardToRegex(packageName);
-                var regex = new Regex(rexexPattern, RegexOptions.IgnoreCase);
+                var regex = ConvertWildcardToRegex(packageName);
 
                 var matched = context.PackageReferences.Any(pkg => regex.IsMatch(pkg.Name));
 
@@ -138,6 +137,28 @@ namespace ArcXray.Analyzers.Applications.Checks
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Converts wildcard pattern to regular expression for general strings
+        /// </summary>
+        /// <param name="pattern">Wildcard pattern</param>
+        /// <returns>Regex object</returns>
+        private static Regex ConvertWildcardToRegex(string pattern)
+        {
+            // Escape special regex characters except our wildcards
+            var escaped = Regex.Escape(pattern);
+
+            // Replace escaped wildcards with regex patterns
+            escaped = escaped
+                .Replace("\\*\\*", ".*")      // ** = any characters (including dots)
+                .Replace("\\*", "[^.]*")      // * = any characters except dots (single segment)
+                .Replace("\\?", ".");         // ? = single character
+
+            // Add anchors for exact matching (start and end of string)
+            var regexPattern = $"^{escaped}$";
+
+            return new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         /// <summary>

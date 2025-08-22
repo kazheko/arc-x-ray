@@ -1,4 +1,5 @@
-﻿using ArcXray.Contracts;
+﻿using ArcXray.Analyzers.Applications.Extensions;
+using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
 using ArcXray.Contracts.RepositoryStructure;
 using Microsoft.CodeAnalysis;
@@ -45,7 +46,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                     if (check.Target.Contains("*"))
                     {
                         // Search for files matching the pattern
-                        var files = GetFiles(check.Target, projectContext);
+                        var files = projectContext.AllFiles.FilterByPattern(check.Target);
                         if (files.Any())
                             return Task.FromResult(true);
                         
@@ -84,14 +85,14 @@ namespace ArcXray.Analyzers.Applications.Checks
 
         private bool IsFileExist(string path, ProjectContext projectContext)
         {
-            var normalizedTarget = Helpers.NormalizePath(path);
+            var normalizedTarget = path.NormalizePath();
             return projectContext.AllFiles
-                .Any(file => Helpers.NormalizePath(file).Equals(normalizedTarget));
+                .Any(file => file.NormalizePath().Equals(normalizedTarget));
         }
 
         private bool IsDirectoryExist(string directoryPath, ProjectContext projectContext)
         {
-            var normalizedDir = Helpers.NormalizePath(directoryPath);
+            var normalizedDir = directoryPath.NormalizePath();
 
             return projectContext.AllFiles
                 .Any(file =>Inside(file, normalizedDir));
@@ -101,28 +102,8 @@ namespace ArcXray.Analyzers.Applications.Checks
         {
             var fileDir = Path.GetDirectoryName(file);
             return fileDir != null &&
-                   (Helpers.NormalizePath(fileDir).Equals(normalizedDir) ||
-                    Helpers.NormalizePath(fileDir).StartsWith(normalizedDir + Path.DirectorySeparatorChar));
-        }
-
-        private IEnumerable<string> GetFiles(string pattern, ProjectContext projectContext)
-        {
-            var directory = Path.GetDirectoryName(pattern) ?? "";
-            var filePattern = Path.GetFileName(pattern);
-            var rexexPattern = Helpers.WildcardToRegex(filePattern);
-            var regex = new Regex(rexexPattern, RegexOptions.IgnoreCase);
-
-            var fullDir = Path.Combine(projectContext.ProjectPath, directory);
-
-            return projectContext.AllFiles
-                .Where(file =>
-                {
-                    var fileDir = Path.GetDirectoryName(file);
-                    var fileName = Path.GetFileName(file);
-                    return fileDir != null &&
-                           Helpers.NormalizePath(fileDir).Equals(Helpers.NormalizePath(fullDir)) &&
-                           regex.IsMatch(fileName);
-                });
+                   (fileDir.NormalizePath().Equals(normalizedDir) ||
+                    fileDir.NormalizePath().StartsWith(normalizedDir + Path.DirectorySeparatorChar));
         }
     }
 }

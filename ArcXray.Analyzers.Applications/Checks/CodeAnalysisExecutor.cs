@@ -1,4 +1,5 @@
-﻿using ArcXray.Contracts;
+﻿using ArcXray.Analyzers.Applications.Extensions;
+using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
 using ArcXray.Contracts.RepositoryStructure;
 using Microsoft.CodeAnalysis;
@@ -128,8 +129,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                 {
                     // Example of target with wildcard (Controllers/*.cs)
                     // Filter files in the specific directory
-                    var filteredFiles = GetFiles(target, context);
-
+                    var filteredFiles = context.AllFiles.FilterByPattern(target);
                     files.AddRange(filteredFiles);
                 }
             }
@@ -137,12 +137,12 @@ namespace ArcXray.Analyzers.Applications.Checks
             else if (IsDirectory(target, context))
             {
                 var fullDirectory = Path.Combine(context.ProjectPath, target);
-                var normalizedDir = Helpers.NormalizePath(fullDirectory) + Path.DirectorySeparatorChar;
+                var normalizedDir = fullDirectory.NormalizePath() + Path.DirectorySeparatorChar;
 
                 // All C# files in the specified directory and subdirectories
                 var filteredFiles = sourceFiles
                     .Where(file => file.EndsWith(".cs"))
-                    .Select(file => Helpers.NormalizePath(Path.GetDirectoryName(file)))
+                    .Select(file => Path.GetDirectoryName(file).NormalizePath())
                     .Where(dir => !string.IsNullOrEmpty(dir) && dir.StartsWith(normalizedDir, StringComparison.OrdinalIgnoreCase));
 
                 files.AddRange(filteredFiles);
@@ -154,7 +154,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                     ? target
                     : Path.Combine(context.ProjectPath, target);
 
-                var normalizedPath = Helpers.NormalizePath(fullPath);
+                var normalizedPath = fullPath.NormalizePath();
 
                 var matchingFile = sourceFiles.FirstOrDefault(file =>
                     file.Equals(normalizedPath, StringComparison.OrdinalIgnoreCase));
@@ -168,26 +168,6 @@ namespace ArcXray.Analyzers.Applications.Checks
             return files;
         }
 
-        private IEnumerable<string> GetFiles(string pattern, ProjectContext projectContext)
-        {
-            var directory = Path.GetDirectoryName(pattern) ?? "";
-            var filePattern = Path.GetFileName(pattern);
-            var rexexPattern = Helpers.WildcardToRegex(filePattern);
-            var regex = new Regex(rexexPattern, RegexOptions.IgnoreCase);
-
-            var fullDir = Path.Combine(projectContext.ProjectPath, directory);
-
-            return projectContext.AllFiles
-                .Where(file =>
-                {
-                    var fileDir = Path.GetDirectoryName(file);
-                    var fileName = Path.GetFileName(file);
-                    return fileDir != null &&
-                           Helpers.NormalizePath(fileDir).Equals(Helpers.NormalizePath(fullDir)) &&
-                           regex.IsMatch(fileName);
-                });
-        }
-
         private static bool IsDirectory(string target, ProjectContext context)
         {
             if(target.EndsWith("/") || target.EndsWith("\\"))
@@ -196,7 +176,7 @@ namespace ArcXray.Analyzers.Applications.Checks
             }
 
             var fullPath = Path.Combine(context.ProjectPath, target);
-            var normalizedDir = Helpers.NormalizePath(fullPath) + Path.DirectorySeparatorChar;
+            var normalizedDir = fullPath.NormalizePath() + Path.DirectorySeparatorChar;
 
             return context.SourceFiles.Any(file => file.StartsWith(normalizedDir));
         }
