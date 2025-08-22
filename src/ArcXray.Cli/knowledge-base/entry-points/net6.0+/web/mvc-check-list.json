@@ -1,0 +1,278 @@
+{
+  "metadata": {
+    "projectType": "ASP.NET Core MVC",
+    "schemaVersion": "1.0.0",
+    "description": "Configuration for detecting ASP.NET Core MVC projects (.NET 6.0+)",
+    "lastUpdated": "2024-01-15"
+  },
+  "interpretationRules": {
+    "thresholds": [
+      {
+        "min": 0.85,
+        "max": 1.0,
+        "interpretation": "Definitely ASP.NET Core MVC application",
+        "confidence": "high"
+      },
+      {
+        "min": 0.70,
+        "max": 0.85,
+        "interpretation": "Likely MVC with some API features",
+        "confidence": "medium-high"
+      },
+      {
+        "min": 0.50,
+        "max": 0.70,
+        "interpretation": "Hybrid MVC/API project",
+        "confidence": "medium"
+      },
+      {
+        "min": 0.0,
+        "max": 0.50,
+        "interpretation": "Likely NOT MVC application",
+        "confidence": "low"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "sdk-web",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/@Sdk",
+      "expectedValues": ["Microsoft.NET.Sdk.Web"],
+      "weight": 1.0,
+      "description": "Web SDK required for MVC"
+    },
+    {
+      "id": "target-framework",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/PropertyGroup/TargetFramework",
+      "pattern": "^net[6-9]\\.\\d$|^net\\d{2,}\\.\\d$",
+      "weight": 1.0,
+      "description": ".NET 6.0 or higher"
+    },
+    {
+      "id": "views-directory",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Views/",
+      "weight": 1.0,
+      "description": "Views directory - critical for MVC"
+    },
+    {
+      "id": "razor-view-files",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Views/**/*.cshtml",
+      "weight": 1.0,
+      "description": "Razor view files (.cshtml)"
+    },
+    {
+      "id": "add-controllers-with-views",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddControllersWithViews\\(\\)",
+      "weight": 1.0,
+      "description": "AddControllersWithViews() configuration"
+    },
+    {
+      "id": "controller-inheritance",
+      "category": "mandatory",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassInheritance",
+      "expectedValues": ["Controller"],
+      "weight": 1.0,
+      "description": "Controllers inherit from Controller (not ControllerBase)"
+    },
+    {
+      "id": "viewstart-file",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Views/_ViewStart.cshtml",
+      "weight": 0.8,
+      "description": "_ViewStart.cshtml for shared layout"
+    },
+    {
+      "id": "layout-file",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Views/Shared/_Layout.cshtml",
+      "weight": 0.8,
+      "description": "_Layout.cshtml master page"
+    },
+    {
+      "id": "viewimports-file",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Views/_ViewImports.cshtml",
+      "weight": 0.8,
+      "description": "_ViewImports.cshtml for shared imports"
+    },
+    {
+      "id": "shared-views-directory",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Views/Shared/",
+      "weight": 0.8,
+      "description": "Shared views directory"
+    },
+    {
+      "id": "wwwroot-directory",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "wwwroot/",
+      "weight": 0.8,
+      "description": "Static files directory"
+    },
+    {
+      "id": "static-files",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "wwwroot/**/*.(css|js|jpg|png|ico)",
+      "weight": 0.8,
+      "description": "Static files (CSS, JS, images)"
+    },
+    {
+      "id": "use-static-files",
+      "category": "strong",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseStaticFiles\\(\\)",
+      "weight": 0.8,
+      "description": "UseStaticFiles() middleware"
+    },
+    {
+      "id": "view-result-methods",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "MethodReturnType",
+      "expectedValues": ["ViewResult", "IActionResult", "Task<IActionResult>"],
+      "weight": 0.8,
+      "description": "Methods returning Views"
+    },
+    {
+      "id": "return-view-calls",
+      "category": "strong",
+      "type": "FileContent",
+      "target": "Controllers/*.cs",
+      "pattern": "return\\s+View\\(",
+      "weight": 0.9,
+      "description": "return View() statements"
+    },
+    {
+      "id": "no-api-controller-attr",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassAttribute",
+      "expectedValues": ["ApiController"],
+      "weight": -0.9,
+      "description": "No [ApiController] attribute (negative if found)"
+    },
+    {
+      "id": "add-razor-pages",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddRazorPages\\(\\)",
+      "weight": -0.5,
+      "description": "AddRazorPages() suggests Razor Pages, not MVC"
+    },
+    {
+      "id": "home-controller",
+      "category": "medium",
+      "type": "FileExists",
+      "target": "Controllers/HomeController.cs",
+      "weight": 0.7,
+      "description": "HomeController - typical for MVC"
+    },
+    {
+      "id": "models-directory",
+      "category": "medium",
+      "type": "FileExists",
+      "target": "Models/",
+      "alternativeTargets": ["ViewModels/"],
+      "weight": 0.7,
+      "description": "Models/ViewModels directory"
+    },
+    {
+      "id": "tag-helpers",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Views/**/*.cshtml",
+      "pattern": "asp-(action|controller|route|for|validation)",
+      "weight": 0.7,
+      "description": "ASP.NET Core tag helpers in views"
+    },
+    {
+      "id": "viewdata-viewbag",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "(ViewData|ViewBag)\\[",
+      "weight": 0.6,
+      "description": "ViewData/ViewBag usage"
+    },
+    {
+      "id": "partial-views",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Views/**/*.cshtml",
+      "pattern": "@Html\\.Partial|@await Html\\.PartialAsync|<partial",
+      "weight": 0.6,
+      "description": "Partial views usage"
+    },
+    {
+      "id": "areas-directory",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "Areas/",
+      "weight": 0.5,
+      "description": "Areas for large MVC apps"
+    },
+    {
+      "id": "bundling-config",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "bundleconfig.json",
+      "weight": 0.5,
+      "description": "Bundle configuration for assets"
+    },
+    {
+      "id": "libman-json",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "libman.json",
+      "weight": 0.5,
+      "description": "Library Manager for client-side libraries"
+    },
+    {
+      "id": "validation-scripts",
+      "category": "auxiliary",
+      "type": "FileExists",
+      "target": "Views/Shared/_ValidationScriptsPartial.cshtml",
+      "weight": 0.5,
+      "description": "Client-side validation scripts"
+    },
+    {
+      "id": "identity-ui",
+      "category": "auxiliary",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.Identity.UI",
+      "weight": 0.5,
+      "description": "Identity UI for authentication views"
+    },
+    {
+      "id": "no-swagger",
+      "category": "auxiliary",
+      "type": "NuGetPackage",
+      "target": "Swashbuckle.AspNetCore",
+      "weight": -0.3,
+      "description": "No Swagger (negative if found - suggests API)"
+    }
+  ]
+}
