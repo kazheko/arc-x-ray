@@ -8,10 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="knowledge-base\app-detection\net6.0+\web\minimalapi-detection-config.json" />
     <None Remove="knowledge-base\app-detection\net6.0+\web\webapi-detection-config.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="knowledge-base\app-detection\net6.0+\web\minimalapi-detection-config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="knowledge-base\app-detection\net6.0+\web\webapi-detection-config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

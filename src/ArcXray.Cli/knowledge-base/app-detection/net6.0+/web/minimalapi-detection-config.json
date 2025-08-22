@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "projectType": "Minimal API",
+    "schemaVersion": "2.0.0",
+    "description": "Configuration for detecting Minimal API projects in mixed solutions",
+    "lastUpdated": "01-08-2025"
+  },
+  "interpretationRules": {
+    "thresholds": [
+      {
+        "min": 0.85,
+        "max": 1.0,
+        "interpretation": "Clean Minimal API project",
+        "confidence": "high"
+      },
+      {
+        "min": 0.65,
+        "max": 0.85,
+        "interpretation": "Likely Minimal API with non-standard configuration",
+        "confidence": "medium-high"
+      },
+      {
+        "min": 0.50,
+        "max": 0.65,
+        "interpretation": "Hybrid API project (Minimal API + Controllers)",
+        "confidence": "medium"
+      },
+      {
+        "min": 0.0,
+        "max": 0.50,
+        "interpretation": "Likely NOT Minimal API",
+        "confidence": "low"
+      }
+    ],
+    "minimumChecksForConfidence": {
+      "high": [ "sdk-web", "target-framework-net6-plus", "web-application-builder", "map-endpoint-methods", "no-controllers-directory" ],
+      "medium-high": [ "sdk-web", "target-framework-net6-plus", "web-application-builder", "map-endpoint-methods" ]
+    }
+  },
+  "checks": [
+    {
+      "id": "sdk-web",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/@Sdk",
+      "expectedValues": ["Microsoft.NET.Sdk.Web"],
+      "weight": 1.0,
+      "description": "Web SDK (excludes WPF, console, and class libraries)"
+    },
+    {
+      "id": "target-framework",
+      "category": "mandatory",
+      "type": "ProjectFile",
+      "target": "Project/PropertyGroup/TargetFramework",
+      "pattern": "^net[6-9]\\.\\d$|^net\\d{2,}\\.\\d$",
+      "weight": 1.0,
+      "description": "Modern .NET version"
+    },
+    {
+      "id": "web-application-builder",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "Program.cs",
+      "pattern": "WebApplication\\.CreateBuilder\\(args\\)",
+      "weight": 1.0,
+      "description": "Использование WebApplication.CreateBuilder"
+    },
+    {
+      "id": "map-endpoints",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.(MapGet|MapPost|MapPut|MapDelete|MapPatch|MapMethods)\\s*\\(",
+      "description": "Covers all endpoint mappings",
+      "weight": 1.0
+    },
+    {
+      "id": "program-exists",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Program.cs",
+      "weight": 0.8,
+      "description": "Program.cs exists"
+    },
+    {
+      "id": "startup-exists",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Startup.cs",
+      "weight": -0.5,
+      "description": "Startup.cs exists (negative weight if exists)"
+    },
+    {
+      "id": "controllers-directory",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Controllers/",
+      "weight": -0.7,
+      "description": "Controllers directory exists - (negative weight if exists)"
+    },
+    {
+      "id": "add-controllers",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Program.cs",
+      "alternativeTargets": ["Startup.cs"],
+      "pattern": "\\.AddControllers\\(",
+      "weight": -0.6,
+      "description": "AddControllers() - (negative weight if exists)"
+    },
+    {
+      "id": "results-usage",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "(Results|TypedResults)\\.[A-Z][a-zA-Z]+\\s*\\(",
+      "description": "Covers all Results methods",
+      "weight": 0.7
+    },
+    {
+      "id": "map-group",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapGroup\\s*\\(",
+      "description": "Route groups",
+      "weight": 0.6
+    },
+    {
+      "id": "add-cors",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Program.cs",
+      "pattern": "Services\\.AddCors\\(\\)",
+      "weight": 0.5,
+      "description": "CORS configuration for API"
+    },
+    {
+      "id": "add-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "Services\\.AddAuthentication\\(",
+      "weight": 0.7,
+      "description": "Authentication configuration"
+    }, 
+    {
+      "id": "add-versioning",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "Program.cs",
+      "pattern": "Services\\.AddApiVersioning\\(",
+      "weight": 0.6,
+      "description": "API versioning"
+    },    
+    {
+      "id": "swagger-package",
+      "category": "auxiliary",
+      "type": "NuGetPackage",
+      "target": "Swashbuckle.AspNetCore",
+      "alternativeTargets": ["NSwag.AspNetCore", "NSwag.AspNetCore.AspNet"],
+      "weight": 0.5,
+      "description": "Swagger/OpenAPI documentation package (optional but common)"
+    },
+    {
+      "id": "openapi-package",
+      "category": "auxiliary",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.OpenApi",
+      "weight": 0.5,
+      "description": "OpenAPI package"
+    },
+    {
+      "id": "add-endpoints-explorer",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddEndpointsApiExplorer\\(\\)",
+      "weight": 0.5,
+      "description": "EndpointsApiExplorer (only with OpenAPI)"
+    },
+    {
+      "id": "jwt-bearer-package",
+      "category": "strong",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "weight": 0.6,
+      "description": "JWT - typical API authentication"
+    },
+    {
+      "id": "health-checks",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddHealthChecks\\(\\)",
+      "weight": 0.5,
+      "description": "Health checks for API monitoring"
+    }
+  ]
+}
