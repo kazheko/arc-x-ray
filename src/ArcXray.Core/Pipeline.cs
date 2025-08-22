@@ -57,7 +57,7 @@ namespace ArcXray.Core
 
                         var result = await _analyzeApplication.AnalyzeProjectAsync(context, config);
 
-                        _logger.Info($"=== Web API Detection Results ===");
+                        _logger.Info($"=== {result.ProjectType} Detection Results ===");
                         _logger.Info($"Project: {result.ProjectPath}");
                         _logger.Info($"Confidence: {result.Confidence:P2}");
                         _logger.Info($"Interpretation: {result.Interpretation}");
