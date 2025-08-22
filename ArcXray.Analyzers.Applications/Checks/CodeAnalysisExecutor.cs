@@ -129,7 +129,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                 {
                     // Example of target with wildcard (Controllers/*.cs)
                     // Filter files in the specific directory
-                    var filteredFiles = context.AllFiles.FilterByPattern(target);
+                    var filteredFiles = context.AllFiles.FilterByPattern(context.ProjectPath, target);
                     files.AddRange(filteredFiles);
                 }
             }

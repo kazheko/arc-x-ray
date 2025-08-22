@@ -3,7 +3,6 @@ using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
 using ArcXray.Contracts.RepositoryStructure;
 using Microsoft.CodeAnalysis;
-using System.Text.RegularExpressions;
 
 namespace ArcXray.Analyzers.Applications.Checks
 {
@@ -46,7 +45,8 @@ namespace ArcXray.Analyzers.Applications.Checks
                     if (check.Target.Contains("*"))
                     {
                         // Search for files matching the pattern
-                        var files = projectContext.AllFiles.FilterByPattern(check.Target);
+                        var files = projectContext.AllFiles.FilterByPattern(projectContext.ProjectPath, check.Target);
+
                         if (files.Any())
                             return Task.FromResult(true);
                         
