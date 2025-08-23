@@ -1,4 +1,5 @@
-﻿using ArcXray.Contracts;
+﻿using ArcXray.Analyzers.Applications.Extensions;
+using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
 using ArcXray.Contracts.RepositoryStructure;
 using System.Text.RegularExpressions;
@@ -116,36 +117,8 @@ namespace ArcXray.Analyzers.Applications.Checks
             // Example: "Controllers/*.cs" means all .cs files in Controllers directory
             else if (target.Contains("*") || target.Contains("?"))
             {
-                // Split into directory and file pattern
-                var directory = Path.GetDirectoryName(target)?.Replace('\\', '/') ?? "";
-                var filePattern = Path.GetFileName(target);
-
-                // Build full directory path
-                var fullDirectory = string.IsNullOrEmpty(directory)
-                    ? context.ProjectPath
-                    : Path.Combine(context.ProjectPath, directory);
-
-                // Normalize directory path for comparison
-                var normalizedDirectory = NormalizePath(fullDirectory);
-
-                // Create regex for file pattern
-                var regex = CreateFilePatternRegex(filePattern);
-
-                // Find files in the specific directory that match the pattern
-                matchingFiles.AddRange(
-                    context.AllFiles.Where(file =>
-                    {
-                        var fileDir = Path.GetDirectoryName(file);
-                        var fileName = Path.GetFileName(file);
-
-                        // Check if file is in the target directory
-                        if (fileDir == null || !NormalizePath(fileDir).Equals(normalizedDirectory, StringComparison.OrdinalIgnoreCase))
-                            return false;
-
-                        // Check if filename matches the pattern
-                        return regex.IsMatch(fileName);
-                    })
-                );
+                var files = context.AllFiles.FilterByPattern(context.ProjectPath, target);
+                matchingFiles.AddRange(files);
             }
             // Case 3: Specific file path (no wildcards)
             // Example: "Program.cs" or "Controllers/WeatherController.cs"
