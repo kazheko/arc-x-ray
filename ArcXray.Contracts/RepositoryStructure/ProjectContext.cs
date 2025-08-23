@@ -14,9 +14,7 @@ namespace ArcXray.Contracts.RepositoryStructure
         public string ProjectName { get; private set; }
         public string Sdk { get; private set; } = string.Empty;
         public IEnumerable<string> TargetFrameworks { get; private set; } = Enumerable.Empty<string>();
-        public IEnumerable<string> SourceFiles { get; private set; } = new List<string>();
         public XDocument ProjectFileContent { get; private set; } = new XDocument();
-        public IEnumerable<string> ViewFiles { get; private set; } = new List<string>();
         public IEnumerable<string> AllFiles { get; private set; } = Enumerable.Empty<string>();
         public IEnumerable<PackageReference> PackageReferences { get; private set; } = new List<PackageReference>();
         public IEnumerable<ProjectReference> ProjectReferences { get; private set; } = new List<ProjectReference>();
@@ -34,16 +32,6 @@ namespace ArcXray.Contracts.RepositoryStructure
         public void UpdateFiles(IEnumerable<string> files)
         {
             AllFiles = files.Select(NormalizePath);
-        }
-
-        public void UpdateSourceFiles(IEnumerable<string> files)
-        {
-            SourceFiles = files;
-        }
-
-        public void UpdateViewFiles(IEnumerable<string> files)
-        {
-            ViewFiles = files;
         }
 
         public void UpdateSdk(string? sdk)

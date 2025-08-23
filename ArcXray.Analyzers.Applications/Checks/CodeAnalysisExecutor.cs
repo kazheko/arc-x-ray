@@ -112,9 +112,7 @@ namespace ArcXray.Analyzers.Applications.Checks
             var files = new List<string>();
 
             // Use SourceFiles from context if available (already filtered to .cs files)
-            var sourceFiles = context.SourceFiles?.Any() == true
-                ? context.SourceFiles
-                : context.AllFiles.Where(f => f.EndsWith(".cs", StringComparison.OrdinalIgnoreCase));
+            var sourceFiles = context.AllFiles.Where(f => f.EndsWith(".cs", StringComparison.OrdinalIgnoreCase));
 
             // Case 1: Wildcard patterns
             if (target.Contains("*"))
@@ -178,7 +176,7 @@ namespace ArcXray.Analyzers.Applications.Checks
             var fullPath = Path.Combine(context.ProjectPath, target);
             var normalizedDir = fullPath.NormalizePath() + Path.DirectorySeparatorChar;
 
-            return context.SourceFiles.Any(file => file.StartsWith(normalizedDir));
+            return context.AllFiles.Any(file => file.StartsWith(normalizedDir));
         }
 
         /// <summary>

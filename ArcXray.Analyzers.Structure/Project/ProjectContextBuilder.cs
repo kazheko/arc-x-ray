@@ -11,16 +11,6 @@ namespace ArcXray.Analyzers.Projects.Structure
            "bin", "obj", ".vs", ".git", "node_modules", "packages", ".idea", "TestResults"
         };
 
-        private static readonly HashSet<string> SourceExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-           ".cs"
-        };
-
-        private static readonly HashSet<string> ViewExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-           ".cshtml", ".razor"
-        };
-
         private readonly ILogger _logger;
         private readonly IFileRepository _fileRepository;
 
@@ -84,17 +74,6 @@ namespace ArcXray.Analyzers.Projects.Structure
         {
             var allFiles = FindProjectFiles(context.ProjectPath);
             context.UpdateFiles(allFiles);
-
-            var sourceFiles = allFiles.Where(file => SourceExtensions.Contains(GetFileExtension(file)));
-            context.UpdateSourceFiles(sourceFiles);
-
-            var viewFiles = allFiles.Where(file => ViewExtensions.Contains(GetFileExtension(file)));
-            context.UpdateViewFiles(viewFiles);
-        }
-
-        private static string GetFileExtension(string filePath)
-        {
-            return filePath.Split('.').Last();
         }
 
         private IEnumerable<string> FindProjectFiles(string projectPath)
