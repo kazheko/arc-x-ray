@@ -4,6 +4,6 @@ namespace ArcXray.Contracts.Reporting
 {
     public interface IGenerateDiagram
     {
-        Task<string> GenerateProjectDependencyGraph(SolutionInfo solutionInfo);
+        Task<string> GenerateProjectDependencyGraphAsync(SolutionInfo solutionInfo);
     }
 }

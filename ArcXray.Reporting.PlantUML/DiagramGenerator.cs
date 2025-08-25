@@ -6,7 +6,7 @@ namespace ArcXray.Reporting.PlantUML
 {
     public class DiagramGenerator : IGenerateDiagram
     {
-        public async Task<string> GenerateProjectDependencyGraph(SolutionInfo solutionInfo)
+        public async Task<string> GenerateProjectDependencyGraphAsync(SolutionInfo solutionInfo)
         {
             var data = await File.ReadAllTextAsync($"Templates/ProjectDependencyGraph.sbn");
 
@@ -21,12 +21,12 @@ namespace ArcXray.Reporting.PlantUML
                 })
             });
 
-            if (!Directory.Exists("output"))
+            if (!Directory.Exists("output/diagrams"))
             {
-                Directory.CreateDirectory("output/solutions");
+                Directory.CreateDirectory("output/diagrams");
             }
 
-            var path = $"output/{solutionInfo.Name.Replace('.', '-').ToLower()}-proj-deps-graph.pu";
+            var path = $"output/diagrams/{solutionInfo.Name.Replace('.', '-').ToLower()}-proj-deps-graph.pu";
 
             await File.WriteAllTextAsync(path, result);
 
