@@ -2,6 +2,7 @@
 {
     public interface IBuildProjectContext
     {
-        ProjectContext CreateFromCsproj(string csprojPath);
+        ProjectInfo BuildProjectInfo(string csprojPath);
+        ProjectContext BuildProjectContext(ProjectInfo projectInfo);
     }
 }

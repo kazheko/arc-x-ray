@@ -20,12 +20,12 @@ namespace ArcXray.Analyzers.Projects.Structure
             _fileRepository = fileRepository;
         }
 
-        public ProjectContext CreateFromCsproj(string csprojPath)
+        public ProjectInfo BuildProjectInfo(string csprojPath)
         {
             if (!File.Exists(csprojPath))
                 throw new FileNotFoundException($"Project file not found: {csprojPath}");
 
-            var context = new ProjectContext
+            var projectInfo = new ProjectInfo
             (
                 projectPath: Path.GetDirectoryName(csprojPath) ?? string.Empty,
                 projectName: Path.GetFileNameWithoutExtension(csprojPath)
@@ -33,47 +33,43 @@ namespace ArcXray.Analyzers.Projects.Structure
 
             try
             {
-                LoadCsprojDetails(csprojPath, context);
+                LoadCsprojDetails(csprojPath, projectInfo);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error parsing project file: {ex.Message}");
             }
 
-            // Load project files
-            LoadProjectFiles(context);
-
-            return context;
+            return projectInfo;
         }
 
-        private static void LoadCsprojDetails(string csprojPath, ProjectContext context)
+        public ProjectContext BuildProjectContext(ProjectInfo projectInfo)
         {
-            //todo: use file repository
+            var allFiles = FindProjectFiles(projectInfo.ProjectPath);
+            return new ProjectContext(projectInfo, allFiles);
+        }
+
+        private static void LoadCsprojDetails(string csprojPath, ProjectInfo projectInfo)
+        {
             // Load and parse XML
             var doc = XDocument.Load(csprojPath);
-            context.UpdateProjectFileContent(doc);
+            projectInfo.UpdateProjectFileContent(doc);
 
             // Load project Target Frameworks
             var frameworks = CsprojParser.GetTargetFrameworks(doc);
-            context.UpdateTargetFrameworks(frameworks);
+            projectInfo.UpdateTargetFrameworks(frameworks);
 
             // Load project SDK
             var sdk = CsprojParser.GetSdk(doc);
-            context.UpdateSdk(sdk);
+            projectInfo.UpdateSdk(sdk);
 
             // Load package references
             var packRefs = CsprojParser.GetPackageReferences(doc);
-            context.UpdatePackageReference(packRefs);
+            projectInfo.UpdatePackageReference(packRefs);
 
             // Load project references
             var projRefs = CsprojParser.GetProjectReferences(doc, csprojPath);
-            context.UpdateProjectReferences(projRefs);
-        }
-
-        private void LoadProjectFiles(ProjectContext context)
-        {
-            var allFiles = FindProjectFiles(context.ProjectPath);
-            context.UpdateFiles(allFiles);
+            projectInfo.UpdateProjectReferences(projRefs);
         }
 
         private IEnumerable<string> FindProjectFiles(string projectPath)

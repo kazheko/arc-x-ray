@@ -7,10 +7,12 @@ namespace ArcXray.Core.RepositoryStructure
     public class RepositoryAnalyzer : IAnalyzeRepository
     {
         private readonly IFileRepository _fileRepository;
+        private readonly IBuildProjectContext _projectContextBuilder;
 
-        public RepositoryAnalyzer(IFileRepository fileRepository)
+        public RepositoryAnalyzer(IFileRepository fileRepository, IBuildProjectContext projectContextBuilder)
         {
             _fileRepository = fileRepository;
+            _projectContextBuilder = projectContextBuilder;
         }
 
         public async Task<RepositoryInfo> AnalyzeAsync(string repoPath, string[] excludeKeywords)
@@ -23,13 +25,15 @@ namespace ArcXray.Core.RepositoryStructure
                 var projectPaths = await GetProjectPathsAsync(sln);
 
                 projectPaths = projectPaths
-                    .Where(p => !excludeKeywords.Any(kw => p.Contains(kw, StringComparison.OrdinalIgnoreCase)))
-  ;
+                    .Where(p => !excludeKeywords.Any(kw => p.Contains(kw, StringComparison.OrdinalIgnoreCase)));
+
+                var projects = projectPaths
+                    .Select(_projectContextBuilder.BuildProjectInfo);
 
                 solutions.Add(new SolutionInfo(
-                    Name: Path.GetFileNameWithoutExtension(sln),
-                    Path: sln,
-                    ProjectPaths: projectPaths
+                    name: Path.GetFileNameWithoutExtension(sln),
+                    path: sln,
+                    projects: projects
                 ));
             }
 

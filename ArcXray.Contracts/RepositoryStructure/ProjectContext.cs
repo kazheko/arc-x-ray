@@ -4,50 +4,21 @@ namespace ArcXray.Contracts.RepositoryStructure
 {
     public class ProjectContext
     {
-        public ProjectContext(string projectPath, string projectName)
+        private readonly ProjectInfo _projectInfo;
+        public ProjectContext(ProjectInfo projectInfo, IEnumerable<string> allFiles)
         {
-            ProjectPath = projectPath;
-            ProjectName = projectName;
+            _projectInfo = projectInfo;
+            AllFiles = allFiles.Select(NormalizePath);
         }
 
-        public string ProjectPath { get; private set; }
-        public string ProjectName { get; private set; }
-        public string Sdk { get; private set; } = string.Empty;
-        public IEnumerable<string> TargetFrameworks { get; private set; } = Enumerable.Empty<string>();
-        public XDocument ProjectFileContent { get; private set; } = new XDocument();
-        public IEnumerable<string> AllFiles { get; private set; } = Enumerable.Empty<string>();
-        public IEnumerable<PackageReference> PackageReferences { get; private set; } = new List<PackageReference>();
-        public IEnumerable<ProjectReference> ProjectReferences { get; private set; } = new List<ProjectReference>();
-
-        public void UpdateTargetFrameworks(IEnumerable<string> frameworks)
-        {
-            TargetFrameworks = frameworks;
-        }
-
-        public void UpdateProjectFileContent(XDocument document)
-        {
-            ProjectFileContent = document;
-        }
-
-        public void UpdateFiles(IEnumerable<string> files)
-        {
-            AllFiles = files.Select(NormalizePath);
-        }
-
-        public void UpdateSdk(string? sdk)
-        {
-            Sdk = sdk ?? string.Empty;
-        }
-
-        public void UpdatePackageReference(IEnumerable<PackageReference> packageReferences)
-        {
-            PackageReferences = packageReferences;
-        }
-
-        public void UpdateProjectReferences(IEnumerable<ProjectReference> projectReferences)
-        {
-            ProjectReferences = projectReferences;
-        }
+        public string ProjectPath => _projectInfo.ProjectPath;
+        public string ProjectName => _projectInfo.ProjectName;
+        public string Sdk => _projectInfo.Sdk;
+        public string Type => _projectInfo.Type;
+        public IEnumerable<string> TargetFrameworks => _projectInfo.TargetFrameworks;
+        public IEnumerable<PackageReference> PackageReferences => _projectInfo.PackageReferences;
+        public IEnumerable<ProjectReference> ProjectReferences => _projectInfo.ProjectReferences;
+        public IEnumerable<string> AllFiles { get; private set; }
 
         /// <summary>
         /// Normalizes file paths for comparison.

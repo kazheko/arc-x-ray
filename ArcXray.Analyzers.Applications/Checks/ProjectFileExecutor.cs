@@ -60,7 +60,7 @@ namespace ArcXray.Analyzers.Applications.Checks
                 {
                     // Step 2: Parse the .csproj content.
                     // Determine what type of check we're performing.
-                    checkResult = CheckProjectFile(check, projectContext.ProjectFileContent);
+                    throw new NotImplementedException();
                 }
 
                 return Task.FromResult(checkResult);
