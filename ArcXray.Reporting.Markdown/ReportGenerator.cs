@@ -43,10 +43,10 @@ namespace ArcXray.Reporting.Markdown
             var result = template.Render(new
             {
                 Name = solutionInfo.Name,
-                Projects = solutionInfo.Projects.Values.Select(x => new
+                Projects = solutionInfo.AllProjects.Select(x => new
                 {
                     Name = x.ProjectName,
-                    IsEntryPoint = solutionInfo.RootProjectPaths.Contains(x.ProjectPath),
+                    IsEntryPoint = solutionInfo.RootProjects.Any( r=> r.ProjectPath.Equals(x.ProjectPath, StringComparison.OrdinalIgnoreCase)),
                     Type = x.Type,
                     Path = x.ProjectPath
                 }),

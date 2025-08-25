@@ -8,23 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="knowledge-base\entry-points\net6.0+\web\minimalapi-check-list.json" />
-    <None Remove="knowledge-base\entry-points\net6.0+\web\mvc-check-list.json" />
-    <None Remove="knowledge-base\entry-points\net6.0+\web\razor-pages-check-list.json" />
-    <None Remove="knowledge-base\entry-points\net6.0+\web\webapi-check-list.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="knowledge-base\entry-points\net6.0+\web\minimalapi-check-list.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="knowledge-base\entry-points\net6.0+\web\mvc-check-list.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="knowledge-base\entry-points\net6.0+\web\razor-pages-check-list.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="knowledge-base\entry-points\net6.0+\web\webapi-check-list.json">
+    <Content Include="knowledge-base\entry-points\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

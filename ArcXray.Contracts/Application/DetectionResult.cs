@@ -2,6 +2,8 @@
 {
     public class DetectionResult
     {
+        private readonly List<CheckResult> _checkResults = new List<CheckResult>();
+
         public string ProjectName { get; set; }
         public string ProjectPath { get; set; }
         public string ProjectType { get; set; }
@@ -14,9 +16,8 @@
                     : 0;
             }
         }
-        public string Interpretation { get; set; }
-        public string ConfidenceLevel { get; set; }
-        public List<CheckResult> Checks { get; set; } = new List<CheckResult>();
+        public string Interpretation { get; private set; } = string.Empty;
+        public IEnumerable<CheckResult> Checks => _checkResults;
         public double TotalScore
         {
             get
@@ -34,8 +35,14 @@
         public DateTime AnalysisTimestamp { get; set; }
         public TimeSpan AnalysisDuration { get; set; }
 
-        // Grouped view for reporting
-        public Dictionary<string, List<CheckResult>> ChecksByCategory =>
-            Checks.GroupBy(c => c.Category).ToDictionary(g => g.Key, g => g.ToList());
+        public void AddCheckResult(CheckResult checkResult)
+        {
+            _checkResults.Add(checkResult);
+        }
+
+        public void UpdateInterpretation(string interpretation)
+        {
+            Interpretation = interpretation;
+        }
     }
 }

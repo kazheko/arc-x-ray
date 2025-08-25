@@ -14,7 +14,7 @@ namespace ArcXray.Reporting.PlantUML
             var result = template.Render(new
             {
                 Solution = solutionInfo.Name,
-                Projects = solutionInfo.Projects.Values.Select(x=>new {
+                Projects = solutionInfo.AllProjects.Select(x=>new {
                     Name = x.ProjectName, 
                     Sdk = x.Sdk, 
                     Refs = x.ProjectReferences.Select(r=>r.ProjectName)

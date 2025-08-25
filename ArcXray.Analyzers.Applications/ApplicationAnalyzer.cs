@@ -2,6 +2,7 @@
 using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
 using ArcXray.Contracts.RepositoryStructure;
+using System.Text.RegularExpressions;
 
 namespace ArcXray.Analyzers.Applications
 {
@@ -38,18 +39,45 @@ namespace ArcXray.Analyzers.Applications
                 AnalysisTimestamp = startTime
             };
 
-            // Execute all checks
-            foreach (var check in config.Checks)
+            var framework = projectContext.TargetFrameworks.First();
+            var checks = config.Checks
+                .Where(x => x.Frameworks.Select(CreateFilePatternRegex)
+                .Any(regexp => regexp.IsMatch(framework)));
+
+            foreach (var check in checks)
             {
                 var checkResult = await ExecuteCheckAsync(check, projectContext);
-                result.Checks.Add(checkResult);
+                result.AddCheckResult(checkResult);
             }
 
             // Determine interpretation
-            DetermineInterpretation(result, config);
+            var interpretation = DetermineInterpretation(result, config);
+            result.UpdateInterpretation(interpretation);
 
             result.AnalysisDuration = DateTime.UtcNow - startTime;
             return result;
+        }
+        /// <summary>
+        /// Creates a regex pattern from a file wildcard pattern.
+        /// Converts wildcards (* and ?) to regex equivalents.
+        /// </summary>
+        /// <param name="wildcardPattern">Wildcard pattern (e.g., "*.cs", "Test?.txt")</param>
+        /// <returns>Compiled regex for matching filenames</returns>
+        private Regex CreateFilePatternRegex(string wildcardPattern)
+        {
+            // Escape special regex characters except * and ?
+            var pattern = Regex.Escape(wildcardPattern);
+
+            // Convert wildcards to regex
+            // * = zero or more characters
+            // ? = exactly one character
+            pattern = pattern.Replace("\\*", ".*");
+            pattern = pattern.Replace("\\?", ".");
+
+            // Anchor the pattern to match the entire filename
+            pattern = "^" + pattern + "$";
+
+            return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
         }
 
         private async Task<CheckResult> ExecuteCheckAsync(Check check, ProjectContext projectContext)
@@ -84,34 +112,18 @@ namespace ArcXray.Analyzers.Applications
             return checkResult;
         }
 
-        private void DetermineInterpretation(DetectionResult result, CheckList config)
+        private string DetermineInterpretation(DetectionResult result, CheckList checkList)
         {
-            var threshold = config.InterpretationRules.Thresholds
-                .FirstOrDefault(t => result.Confidence >= t.Min && result.Confidence <= t.Max);
-
-            if (threshold != null)
+            switch (result.Confidence)
             {
-                result.Interpretation = threshold.Interpretation;
-                result.ConfidenceLevel = threshold.Confidence;
-            }
-            else
-            {
-                result.Interpretation = "Unable to determine";
-                result.ConfidenceLevel = "unknown";
-            }
-
-            // Check minimum requirements for high confidence
-            if (result.ConfidenceLevel == "high" && config.InterpretationRules.MinimumChecksForConfidence != null &&
-                config.InterpretationRules.MinimumChecksForConfidence.TryGetValue("high", out var requiredChecks))
-            {
-                var missingChecks = requiredChecks.Where(checkId =>
-                    !result.Checks.Any(c => c.CheckId == checkId && c.Passed)).ToList();
-
-                if (missingChecks.Any())
-                {
-                    result.ConfidenceLevel = "medium-high";
-                    result.Interpretation = $"{result.Interpretation} (missing critical checks: {string.Join(", ", missingChecks)})";
-                }
+                case double confidence when (confidence > 0.85 && confidence <= 1.0):
+                    return $"Definitely {checkList.Metadata.ProjectType}";
+                case double confidence when (confidence > 0.70 && confidence <= 0.85):
+                    return $"Likely {checkList.Metadata.ProjectType} with non-standard configuration";
+                case double confidence when (confidence > 0.50 && confidence <= 0.70):
+                    return $"Partial {checkList.Metadata.ProjectType} usage";
+                default:
+                    return $"Likely NOT {checkList.Metadata.ProjectType}";
             }
         }
     }

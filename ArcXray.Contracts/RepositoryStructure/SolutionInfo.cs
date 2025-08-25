@@ -5,20 +5,23 @@
     /// </summary>
     public class SolutionInfo
     {
+        private readonly IDictionary<string, ProjectInfo> _allProjects;
+        private readonly IEnumerable<string> _rootProjectPaths;
+
         public SolutionInfo(string name, string path, IEnumerable<ProjectInfo> projects)
         {
             Name = name;
             Path = path;
-            Projects = projects.ToDictionary(x => x.ProjectPath);
-            RootProjectPaths = FindRootProjects(projects);
+            _allProjects = projects.ToDictionary(x => x.ProjectPath);
+            _rootProjectPaths = FindRootProjects(projects);
         }
 
         public string Name { get; private set; }
         public string Path { get; private set; }
 
-        public IDictionary<string, ProjectInfo> Projects { get; private set; }
+        public IEnumerable<ProjectInfo> AllProjects => _allProjects.Values;
 
-        public IEnumerable<string> RootProjectPaths { get; private set; }
+        public IEnumerable<ProjectInfo> RootProjects => _rootProjectPaths.Select(x => _allProjects[x]);
 
         private static IEnumerable<string> FindRootProjects(IEnumerable<ProjectInfo> allProjects)
         {

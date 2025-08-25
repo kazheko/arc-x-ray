@@ -33,5 +33,8 @@ namespace ArcXray.Contracts.Application
 
         [JsonPropertyName("description")]
         public string Description { get; set; }
+
+        [JsonPropertyName("frameworks")]
+        public List<string> Frameworks { get; set; }
     }
 }

@@ -16,14 +16,12 @@ namespace ArcXray.Cli
 
         public async Task<IEnumerable<CheckList>> GetConfigAsync(string framework, string sdk, string directory)
         {
-            var netVersion = framework.Replace("net", string.Empty);
-
-            if(double.TryParse(netVersion, out double version) && version >=6)
+            if (!sdk.EndsWith("Web"))
             {
-                framework = "net6.0+";
+                return Enumerable.Empty<CheckList>();
             }
 
-            var dir = Path.Combine(directory, framework, sdk.Split('.').Last());
+            var dir = Path.Combine(directory, sdk.Split('.').Last());
 
             if (!Directory.Exists(dir))
             {

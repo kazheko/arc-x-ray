@@ -2,6 +2,7 @@
 using ArcXray.Contracts.Application;
 using ArcXray.Contracts.Reporting;
 using ArcXray.Contracts.RepositoryStructure;
+using ArcXray.Core.Steps;
 
 namespace ArcXray.Core
 {
@@ -44,33 +45,10 @@ namespace ArcXray.Core
 
             foreach (var solution in structure.Solutions)
             {
-                _logger.Debug($"Processing solution: {solution.Name}, projects count: {solution.Projects.Count()}");
+                _logger.Debug($"Processing solution: {solution.Name}, projects count: {solution.AllProjects.Count()}");
 
-                //foreach (var project in solution.Projects)
-                //{
-                //    _logger.Debug($"Analyzing project at path: {project}");
-
-                //    //var projectInfo = _buildProjectContext.BuildProjectInfo(projectPath);
-                //    var projectContext = _buildProjectContext.BuildProjectContext(project.Value);
-
-                //    var framework = projectContext.ProjectInfo.TargetFrameworks.First(); // todo: rework
-                //    _logger.Debug($"Detected target framework: {framework}, SDK: {projectContext.ProjectInfo.Sdk}");
-
-                //    var configs = await _provideDetectionConfig.GetConfigAsync(framework, projectContext.ProjectInfo.Sdk, detectionConfigPath);
-                //    _logger.Debug($"Loaded {configs.Count()} detection configuration(s) for the project.");
-
-                //    foreach (var config in configs)
-                //    {
-                //        _logger.Debug($"Running analysis with configuration: {config.Metadata.ProjectType}");
-
-                //        var result = await _analyzeApplication.AnalyzeProjectAsync(projectContext, config);
-
-                //        _logger.Info($"=== {result.ProjectType} Detection Results ===");
-                //        _logger.Info($"Project: {result.ProjectPath}");
-                //        _logger.Info($"Confidence: {result.Confidence:P2}");
-                //        _logger.Info($"Interpretation: {result.Interpretation}");
-                //    }
-                //}
+                var step1 = new AnalyzeEntryPoints(_logger, _buildProjectContext, _provideDetectionConfig, _analyzeApplication);
+                var entryPointResults = await step1.AnalyzeAsync(solution, detectionConfigPath);
 
                 var path2 = await _reportGenerator.AppendSolutionInfoAsync(solution);
             }
