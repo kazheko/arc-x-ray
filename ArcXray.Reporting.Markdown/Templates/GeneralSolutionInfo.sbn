@@ -1,0 +1,13 @@
+﻿### {{name}}
+
+#### Projects
+
+| Project | Entry Point | Type | Path |
+| - | - | - | - |
+{{~ for project in projects ~}}
+| {{ project.name }} | {{ project.isEntryPoint }} | {{ project.type }} | {{ project.path }} |
+{{~ end ~}}
+
+#### Project Dependency Graph
+
+![Project Dependency Graph!]({{ projDepsGraphPath }})

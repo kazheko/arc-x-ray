@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\GeneralRepositoryInfo.sbn" />
+    <None Remove="Templates\GeneralSolutionInfo.sbn" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\GeneralRepositoryInfo.sbn">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\GeneralSolutionInfo.sbn">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Scriban" Version="6.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ArcXray.Contracts\ArcXray.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

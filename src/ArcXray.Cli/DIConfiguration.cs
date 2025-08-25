@@ -7,6 +7,7 @@ using ArcXray.Contracts.Reporting;
 using ArcXray.Contracts.RepositoryStructure;
 using ArcXray.Core;
 using ArcXray.Core.RepositoryStructure;
+using ArcXray.Reporting.Markdown;
 using ArcXray.Reporting.PlantUML;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,7 @@ namespace ArcXray.Cli
             serviceCollection.AddTransient<ILogger, ConsoleLogger>();
             serviceCollection.AddTransient<IFileRepository, FileSystemRepository>();
             serviceCollection.AddTransient<IProvideCheckList, CheckListProvider>();
+
             serviceCollection.AddTransient<IAnalyzeRepository, RepositoryAnalyzer>();
 
             serviceCollection.AddTransient<ApplicationAnalyzer>();
@@ -33,6 +35,7 @@ namespace ArcXray.Cli
             serviceCollection.AddTransient<IBuildProjectContext, ProjectContextBuilder>();
 
             serviceCollection.AddTransient<IGenerateDiagram, DiagramGenerator>();
+            serviceCollection.AddTransient<IGenerateReport, ReportGenerator>();
 
             serviceCollection.AddTransient<Pipeline>();
 

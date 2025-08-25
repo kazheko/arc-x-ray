@@ -38,6 +38,8 @@
     <ProjectReference Include="..\..\ArcXray.Analyzers.Applications\ArcXray.Analyzers.Applications.csproj" />
     <ProjectReference Include="..\..\ArcXray.Analyzers.Structure\ArcXray.Analyzers.Structure.csproj" />
     <ProjectReference Include="..\..\ArcXray.Contracts\ArcXray.Contracts.csproj" />
+    <ProjectReference Include="..\..\ArcXray.Reporting.Markdown\ArcXray.Reporting.Markdown.csproj" />
+    <ProjectReference Include="..\..\ArcXray.Reporting.PlantUML\ArcXray.Reporting.PlantUML.csproj" />
     <ProjectReference Include="..\ArcXray.Core\ArcXray.Core.csproj" />
   </ItemGroup>
 

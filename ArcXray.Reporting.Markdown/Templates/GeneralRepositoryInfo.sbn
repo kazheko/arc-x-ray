@@ -1,0 +1,16 @@
+﻿# Discovery Report
+
+## Repository Overview
+
+Repository `{{ path }}` analyzed. Found `{{solutions | array.size}}` solution(s).
+
+{{ if solutions | array.size }}
+| Solution | Project # | Path |
+| - | - | - |
+{{~ for solution in solutions ~}}
+| {{ solution.name }} | {{ solution.projects | array.size }} | {{ solution.path }} |
+{{~ end ~}}
+
+## Solutions
+
+{{ end }}
