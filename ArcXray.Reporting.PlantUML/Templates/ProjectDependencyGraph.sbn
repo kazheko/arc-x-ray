@@ -1,0 +1,32 @@
+﻿{{~ # PlantUML template for visualisation dotnet solution ~}}
+@startuml {{ solution | string.downcase | string.replace " " "_" }}_dependencies
+
+!theme plain
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor #88CC88
+    BorderColor #77B977
+    FontColor #000000
+    FontSize 12
+}
+skinparam arrow {
+    Color #878787
+    FontSize 10
+}
+
+title {{ solution }} - Project Dependencies
+
+{{~ # components ~}}
+{{~ for project in projects ~}}
+component "{{ project.name }}" as {{ project.name | string.downcase | string.replace "." "_" | string.replace "-" "_" }}
+{{~ end ~}}
+
+{{~ # relationships ~}}
+{{~ for project in projects ~}}
+{{~ for dependency in project.refs ~}}
+{{ project.name | string.downcase | string.replace "." "_" | string.replace "-" "_" }} --> {{ dependency | string.downcase | string.replace "." "_" | string.replace "-" "_" }}{{ if dependency.label }} : {{ dependency.label }}{{ end }}
+{{~ end ~}}
+{{~ end ~}}
+
+@enduml

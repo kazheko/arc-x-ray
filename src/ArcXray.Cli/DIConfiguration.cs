@@ -3,9 +3,11 @@ using ArcXray.Analyzers.Projects.Structure;
 using ArcXray.Cli.Loggers;
 using ArcXray.Contracts;
 using ArcXray.Contracts.Application;
+using ArcXray.Contracts.Reporting;
 using ArcXray.Contracts.RepositoryStructure;
 using ArcXray.Core;
 using ArcXray.Core.RepositoryStructure;
+using ArcXray.Reporting.PlantUML;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ArcXray.Cli
@@ -29,6 +31,9 @@ namespace ArcXray.Cli
                 return new AppAnalysisLogger(originalService);
             });
             serviceCollection.AddTransient<IBuildProjectContext, ProjectContextBuilder>();
+
+            serviceCollection.AddTransient<IGenerateDiagram, DiagramGenerator>();
+
             serviceCollection.AddTransient<Pipeline>();
 
             return serviceCollection;
