@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "projectType": "ASP.NET Core Web API",
+    "schemaVersion": "3.0.0",
+    "description": "Checks for detecting ASP.NET Core Web API projects",
+    "lastUpdated": "23-08-2025"
+  },
+  "checks": [
+    {
+      "id": "controller-base-inheritance",
+      "category": "mandatory",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassInheritance",
+      "expectedValues": ["ControllerBase"],
+      "weight": 1.0,
+      "description": "Controllers inherit from ControllerBase",
+      "frameworks": ["netcoreapp*.*", "net*.0"]
+    },
+    {
+      "id": "api-controller-attr",
+      "category": "mandatory",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassAttribute",
+      "expectedValues": ["ApiController"],
+      "weight": 1.0,
+      "description": "[ApiController] attribute - specific to Web API",
+      "frameworks": ["netcoreapp*.*", "net*.0"]
+    },
+    {
+      "id": "http-methods",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "MethodAttribute",
+      "expectedValues": ["HttpGet", "HttpPost", "HttpPut", "HttpDelete", "HttpPatch"],
+      "weight": 0.9,
+      "description": "RESTful HTTP method attributes",
+      "frameworks": ["netcoreapp*.*", "net*.0"]
+    },
+    {
+      "id": "action-result-return",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "MethodReturnType",
+      "expectedValues": ["IActionResult", "ActionResult", "Task<IActionResult>", "Task<ActionResult"],
+      "weight": 0.9,
+      "description": "API-specific return types",
+      "frameworks": ["netcoreapp2.*"]
+    },
+    {
+      "id": "add-mvc",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddMvc\\(",
+      "weight": 0.8,
+      "description": "AddMvc() - MVC registration",
+      "frameworks": ["netcoreapp2.*"]
+    }, 
+    {
+      "id": "use-mvc",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseMvc\\(\\)",
+      "weight": 0.8,
+      "description": "UseMvc() in request pipeline",
+      "frameworks": ["netcoreapp2.*"]
+    },
+    {
+      "id": "map-controllers",
+      "category": "primary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapControllers\\(\\)",
+      "weight": 0.9,
+      "description": "Controller mapping without Views",
+      "frameworks": ["netcoreapp3.*", "net*.0"]
+    },
+    {
+      "id": "route-attribute",
+      "category": "primary",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassAttribute",
+      "expectedValues": ["Route"],
+      "weight": 0.9,
+      "description": "[Route] attribute",
+      "frameworks": ["netcoreapp3.*", "net*.0"]
+    },
+    {
+      "id": "jwt-bearer-package",
+      "category": "strong",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "weight": 0.6,
+      "description": "JWT - typical API authentication",
+      "frameworks": ["netcoreapp*.*", "net*.0"]
+    },
+    {
+      "id": "add-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "Services\\.AddAuthentication\\(",
+      "weight": 0.7,
+      "description": "Authentication configuration",
+      "frameworks": ["netcoreapp*.*", "net*.0"]
+    }
+ ]
+}

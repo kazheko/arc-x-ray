@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "projectType": "Minimal API",
+    "schemaVersion": "2.0.0",
+    "description": "Configuration for detecting Minimal API projects in mixed solutions",
+    "lastUpdated": "01-08-2025"
+  },
+  "checks": [
+    {
+      "id": "map-endpoints",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.(MapGet|MapPost|MapPut|MapDelete|MapPatch|MapMethods)\\s*\\(",
+      "description": "Covers all endpoint mappings",
+      "weight": 1.0,
+      "frameworks": ["net*.0"]
+    },
+    {
+      "id": "results-usage",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "(Results|TypedResults)\\.",
+      "description": "Covers all Results methods",
+      "weight": 0.9,
+      "frameworks": ["net*.0"]
+    },
+    {
+      "id": "jwt-bearer-package",
+      "category": "strong",
+      "type": "NuGetPackage",
+      "target": "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "weight": 0.6,
+      "description": "JWT - typical API authentication",
+      "frameworks": ["net*.0"]
+    },
+    {
+      "id": "add-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddAuthentication\\(",
+      "weight": 0.7,
+      "description": "Authentication configuration",
+      "frameworks": ["net*.0"]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "projectType": "ASP.NET Core MVC",
+    "schemaVersion": "2.0.0",
+    "description": "Configuration for detecting ASP.NET Core MVC projects",
+    "lastUpdated": "22-08-2025"
+  },
+  "checks": [
+    {
+      "id": "razor-view-files",
+      "category": "mandatory",
+      "type": "FileExists",
+      "target": "Views/**/*.cshtml",
+      "weight": 0.8,
+      "description": "Razor view files (.cshtml)",
+      "frameworks": ["netcoreapp*.*","net*.0"]
+    },
+    {
+      "id": "return-view-calls",
+      "category": "strong",
+      "type": "FileContent",
+      "target": "Controllers/*.cs",
+      "pattern": "return\\s+View\\(",
+      "weight": 0.9,
+      "description": "return View() statements",
+      "frameworks": ["netcoreapp*.*","net*.0"]
+    },
+    {
+      "id": "controller-inheritance",
+      "category": "mandatory",
+      "type": "CodeAnalysis",
+      "target": "Controllers/*.cs",
+      "analysisType": "ClassInheritance",
+      "expectedValues": ["Controller"],
+      "weight": 1.0,
+      "description": "Controllers inherit from Controller",
+      "frameworks": ["netcoreapp*.*","net*.0"]
+
+    },
+    {
+      "id": "add-mvc",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "services.AddMvc\\(\\)",
+      "weight": 0.9,
+      "description": "AddMvc() - MVC registration",
+      "frameworks": ["netcoreapp1.*","netcoreapp2.*"]
+    },
+    {
+      "id": "static-files",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "wwwroot/**/*.(css|js|jpg|png|ico)",
+      "weight": 0.2,
+      "description": "Static files (CSS, JS, images)",
+      "frameworks": ["netcoreapp*.*","net*.0"]
+    },
+    {
+      "id": "use-static-files",
+      "category": "strong",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseStaticFiles\\(\\)",
+      "weight": 0.2,
+      "description": "UseStaticFiles() middleware",
+      "frameworks": ["netcoreapp*.*","net*.0"]
+    },
+    {
+      "id": "viewimports-file",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Views/_ViewImports.cshtml",
+      "alternativeTargets": ["Views/_ViewStart.cshtml"],
+      "weight": 0.4,
+      "description": "_ViewImports.cshtml for shared imports",
+      "frameworks": ["netcoreapp*.*","net*.0"]
+    },
+    {
+      "id": "add-controllers-with-views",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddControllersWithViews\\(\\)",
+      "weight": 0.9,
+      "description": "AddControllersWithViews() configuration",
+      "frameworks": ["netcoreapp3.*","net*.0"]
+    },
+    {
+      "id": "add-controllers-with-views",
+      "category": "mandatory",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapControllerRoute\\(",
+      "weight": 0.9,
+      "description": "MapControllerRoute(...) - routing configuration",
+      "frameworks": ["netcoreapp3.*","net*.0"]
+    },
+    {
+      "id": "add-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "Services\\.AddAuthentication\\(",
+      "weight": 0.7,
+      "description": "Authentication configuration",
+      "frameworks": ["netcoreapp*.*", "net*.0"]
+    }
+  ]
+}

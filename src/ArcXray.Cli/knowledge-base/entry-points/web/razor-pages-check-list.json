@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "projectType": "Razor Pages",
+    "schemaVersion": "2.0.0",
+    "description": "Configuration for detecting ASP.NET Core Razor Pages projects",
+    "lastUpdated": "23-08-2024"
+  },
+  "checks": [
+    {
+      "id": "page-model-inheritance",
+      "category": "strong",
+      "type": "CodeAnalysis",
+      "target": "Pages/**/*.cshtml.cs",
+      "analysisType": "ClassInheritance",
+      "expectedValues": ["PageModel"],
+      "weight": 1.0,
+      "description": "Classes inherit from PageModel",
+      "frameworks": ["netcoreapp2.*","netcoreapp3.*","net*.0"]
+    },
+    {
+      "id": "add-mvc",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddMvc\\(",
+      "weight": 0.7,
+      "description": "AddMvc() - MVC registration",
+      "frameworks": ["netcoreapp2.*"]
+    }, 
+    {
+      "id": "use-mvc",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.UseMvc\\(\\)",
+      "weight": 0.7,
+      "description": "UseMvc() in request pipeline",
+      "frameworks": ["netcoreapp2.*"]
+    },    
+    {
+      "id": "page-directive",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "Pages/**/*.cshtml.cs",
+      "pattern": "^\\s*@page\\b",
+      "weight": 0.9,
+      "description": "@page directive",
+      "frameworks": ["netcoreapp2.*","netcoreapp3.*","net*.0"]
+    }, 
+    {
+      "id": "add-razor-pages",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddRazorPages\\(",
+      "weight": 0.9,
+      "description": "AddRazorPages() service registration",
+      "frameworks": ["netcoreapp3.*", "net*.0"]
+    },
+    {
+      "id": "map-razor-pages",
+      "category": "auxiliary",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.MapRazorPages\\(\\)",
+      "weight": 0.9,
+      "description": "MapRazorPages() endpoint routing",
+      "frameworks": ["netcoreapp3.*", "net*.0"]
+    },
+    {
+      "id": "viewimports-page",
+      "category": "strong",
+      "type": "FileExists",
+      "target": "Pages/_ViewImports.cshtml",
+      "weight": 0.4,
+      "description": "_ViewImports.cshtml for shared imports",
+       "frameworks": ["net*.0"]
+    },
+    {
+      "id": "add-authentication",
+      "category": "medium",
+      "type": "FileContent",
+      "target": "**/*.cs",
+      "pattern": "\\.AddAuthentication\\(",
+      "weight": 0.7,
+      "description": "Authentication configuration",
+      "frameworks": ["netcoreapp2.*","netcoreapp3.*","net*.0"]
+    }
+  ]
+}
